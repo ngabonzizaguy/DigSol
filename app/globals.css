@@ -1,0 +1,158 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --font-sans: "Inter", system-ui, sans-serif;
+    --font-display: "EB Garamond", "Times New Roman", serif;
+
+    /* Admin tokens — light */
+    --admin-bg: 250 250 249;          /* stone-50 */
+    --admin-surface: 255 255 255;
+    --admin-elevated: 250 250 249;
+    --admin-border: 231 229 228;       /* stone-200 */
+    --admin-border-soft: 245 245 244;  /* stone-100 */
+    --admin-fg: 12 10 9;
+    --admin-fg-muted: 78 78 78;
+    --admin-fg-subtle: 119 113 105;
+    --admin-accent: 12 10 9;
+    --admin-accent-fg: 255 255 255;
+    --admin-hover: 245 245 244;
+  }
+
+  .dark {
+    /* Admin tokens — dark */
+    --admin-bg: 12 10 9;
+    --admin-surface: 24 22 20;
+    --admin-elevated: 32 29 26;
+    --admin-border: 41 37 36;
+    --admin-border-soft: 28 25 23;
+    --admin-fg: 250 250 249;
+    --admin-fg-muted: 168 162 158;
+    --admin-fg-subtle: 119 113 105;
+    --admin-accent: 250 250 249;
+    --admin-accent-fg: 12 10 9;
+    --admin-hover: 32 29 26;
+    color-scheme: dark;
+  }
+
+  :root {
+    color-scheme: light;
+  }
+
+  /* Themed scrollbars (webkit + firefox) */
+  .dark *::-webkit-scrollbar { width: 10px; height: 10px; }
+  .dark *::-webkit-scrollbar-track { background: rgb(var(--admin-bg)); }
+  .dark *::-webkit-scrollbar-thumb {
+    background: rgb(var(--admin-border));
+    border: 2px solid rgb(var(--admin-bg));
+    border-radius: 6px;
+  }
+  .dark *::-webkit-scrollbar-thumb:hover { background: rgb(var(--admin-fg-subtle)); }
+  .dark *::-webkit-scrollbar-corner { background: rgb(var(--admin-bg)); }
+  .dark * { scrollbar-color: rgb(var(--admin-border)) rgb(var(--admin-bg)); scrollbar-width: thin; }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    background-color: #f5f5f5;
+    color: #4e4e4e;
+    font-family: var(--font-sans);
+    font-size: 16px;
+    line-height: 1.5;
+    letter-spacing: 0.16px;
+  }
+
+  h1, h2, h3, h4 {
+    color: #0c0a09;
+    font-family: var(--font-display);
+    font-weight: 300;
+  }
+
+  ::selection {
+    background: #0c0a09;
+    color: #ffffff;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@layer components {
+  .glass {
+    background: rgba(255, 255, 255, 0.55);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  }
+
+  .glass-dark {
+    background: rgba(28, 25, 23, 0.65);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .liquid {
+    background: linear-gradient(135deg, rgba(255,255,255,0.7), rgba(255,255,255,0.3));
+    backdrop-filter: blur(24px) saturate(150%);
+    -webkit-backdrop-filter: blur(24px) saturate(150%);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.8) inset,
+      0 -1px 0 rgba(0,0,0,0.03) inset,
+      0 12px 40px rgba(0,0,0,0.06);
+  }
+
+  .hairline-grid {
+    background-image:
+      linear-gradient(to right, #e7e5e4 1px, transparent 1px),
+      linear-gradient(to bottom, #e7e5e4 1px, transparent 1px);
+    background-size: 64px 64px;
+  }
+
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .text-pretty {
+    text-wrap: pretty;
+  }
+
+  .shimmer {
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+    background-size: 200% 100%;
+    animation: shimmer 3s linear infinite;
+  }
+}
+
+@layer utilities {
+  .scrollbar-hidden::-webkit-scrollbar { display: none; }
+  .scrollbar-hidden { -ms-overflow-style: none; scrollbar-width: none; }
+
+  .mask-fade-r {
+    mask-image: linear-gradient(to right, black 80%, transparent);
+    -webkit-mask-image: linear-gradient(to right, black 80%, transparent);
+  }
+
+  .mask-fade-edges {
+    mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+    -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+  }
+}
