@@ -1,5 +1,5 @@
 ---
-description: DigSolutions design system rule — always read DESIGN.md before UI work
+description: DigSolutions design system rule — token and UI conventions
 alwaysApply: true
 ---
 
@@ -7,19 +7,18 @@ alwaysApply: true
 
 Before writing or changing any UI:
 
-1. Read [DESIGN.md](../../DESIGN.md) for the canonical token set (ElevenLabs preset adapted for DigSolutions).
-2. Use only mapped semantic tokens:
+1. Use only mapped semantic tokens:
    - `bg-canvas`, `bg-canvas-soft`, `bg-surface-card`, `bg-surface-strong`, `bg-surface-dark`
    - `text-ink`, `text-body`, `text-muted`, `text-on-dark`
    - `border-hairline`, `border-hairline-strong`
    - Gradient orbs (mint, peach, lavender, sky, rose) for atmosphere ONLY — never for buttons or text fills.
-3. Typography:
-   - Display: `font-display` (EB Garamond 300 — Waldenburg substitute) — H1 64px, H2 48px, tight negative tracking.
+2. Typography:
+   - Display: `font-display` (EB Garamond) — H1 64px, H2 48px, tight negative tracking.
    - UI/Body: `font-sans` (Inter) — 16px body, 15px buttons/nav.
-4. Buttons are pill-shaped (`rounded-full`), 40px height, ink pill primary.
-5. Cards: `rounded-2xl` (16px), hairline border, soft hover shadow, optional `glass` utility for liquid glass surfaces.
-6. Section rhythm: 96px desktop / 64px mobile.
-7. Always honor `prefers-reduced-motion`.
+3. Buttons are pill-shaped (`rounded-full`), 40px height, ink pill primary.
+4. Cards: `rounded-2xl` (16px), hairline border, soft hover shadow, optional `glass` utility for liquid glass surfaces.
+5. Section rhythm: 96px desktop / 64px mobile.
+6. Always honor `prefers-reduced-motion`.
 
 ## Animation Stack
 
