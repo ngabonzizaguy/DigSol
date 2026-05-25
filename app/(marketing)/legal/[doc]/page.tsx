@@ -1,9 +1,13 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Container, Section } from "@/components/ui/container";
-import { PageHero } from "@/components/marketing/page-hero";
+import { CmsPageHero } from "@/components/marketing/cms-page-hero";
+import { CtaBand } from "@/components/marketing/cta-band";
 import { Breadcrumbs } from "@/components/marketing/breadcrumbs";
 import { FadeIn } from "@/components/marketing/fade-in";
+import { PageSection } from "@/components/marketing/page-section";
+import { loadMarketingPageStore, pageCtaContent, pageHeroContent } from "@/lib/marketing/marketing-page-content";
+import { getSectionContent } from "@/lib/marketing/page-sections-store";
 
 const docs: Record<string, { title: string; description: string; sections: { heading: string; body: string }[] }> = {
   privacy: {
@@ -53,23 +57,69 @@ export default async function LegalPage({ params }: { params: Promise<{ doc: str
   const { doc: docKey } = await params;
   const doc = docs[docKey];
   if (!doc) notFound();
+
+  const store = await loadMarketingPageStore();
+  const cmsHero = pageHeroContent(store, "legal_detail");
+  const documentBody = getSectionContent<{ title?: string; body?: string }>(store, "legal_detail", "document_body");
+  const cmsBody = documentBody.body?.trim();
+  const cta = pageCtaContent(store, "legal_detail");
+  const hero = {
+    eyebrow: cmsHero.eyebrow ?? "Legal",
+    title: cmsHero.title?.trim() || doc.title,
+    subtitle: cmsHero.subtitle?.trim() || doc.description,
+  };
+
   return (
     <>
-      <PageHero eyebrow="Legal" title={doc.title} subtitle={doc.description} />
-      <Section size="sm">
-        <Container className="max-w-3xl">
-          <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: "Legal" }, { label: doc.title }]} />
-          <div className="mt-10 space-y-8">
-            {doc.sections.map((s, i) => (
-              <FadeIn key={s.heading} delay={i * 0.04}>
-                <h2 className="font-display text-[26px] text-ink">{s.heading}</h2>
-                <p className="mt-3 text-[16px] text-body leading-relaxed">{s.body}</p>
-              </FadeIn>
-            ))}
-            <p className="pt-6 text-[13px] text-muted">Last updated: May 2026</p>
-          </div>
-        </Container>
-      </Section>
+      <PageSection pageId="legal_detail" sectionId="hero">
+        <CmsPageHero {...hero} />
+      </PageSection>
+
+      <PageSection pageId="legal_detail" sectionId="breadcrumbs">
+        <Section className="pb-0" size="sm">
+          <Container className="max-w-3xl">
+            <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: "Legal" }, { label: doc.title }]} />
+          </Container>
+        </Section>
+      </PageSection>
+
+      <PageSection pageId="legal_detail" sectionId="document_body">
+        {cmsBody || doc.sections.length > 0 ? (
+          <Section size="sm">
+            <Container className="max-w-3xl">
+              <div className="space-y-8">
+                {cmsBody ? (
+                  <FadeIn>
+                    {documentBody.title?.trim() ? (
+                      <h2 className="font-display text-[26px] text-ink">{documentBody.title}</h2>
+                    ) : null}
+                    <p className="mt-3 whitespace-pre-line text-[16px] leading-relaxed text-body">{cmsBody}</p>
+                  </FadeIn>
+                ) : (
+                  doc.sections.map((s, i) => (
+                    <FadeIn key={s.heading} delay={i * 0.04}>
+                      <h2 className="font-display text-[26px] text-ink">{s.heading}</h2>
+                      <p className="mt-3 text-[16px] leading-relaxed text-body">{s.body}</p>
+                    </FadeIn>
+                  ))
+                )}
+                <p className="pt-6 text-[13px] text-muted">Last updated: May 2026</p>
+              </div>
+            </Container>
+          </Section>
+        ) : null}
+      </PageSection>
+
+      <PageSection pageId="legal_detail" sectionId="cta_band">
+        <CtaBand
+          title={cta.title}
+          subtitle={cta.subtitle}
+          primaryLabel={cta.primary_label}
+          primaryHref={cta.primary_href}
+          secondaryLabel={cta.secondary_label}
+          secondaryHref={cta.secondary_href}
+        />
+      </PageSection>
     </>
   );
 }

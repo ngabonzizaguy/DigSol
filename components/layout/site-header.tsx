@@ -4,11 +4,29 @@ import * as React from "react";
 import Link from "next/link";
 import { Menu, X, ChevronDown } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
-import { primaryNav } from "@/lib/content/nav";
 import { Button } from "../ui/button";
 import { cn } from "@/lib/utils";
+import type { PrimaryNavItem } from "@/lib/marketing/site-nav-server";
 
-export function SiteHeader() {
+type SiteHeaderProps = {
+  nav: PrimaryNavItem[];
+  brandName: string;
+  logoAbbr: string;
+  contactLabel: string;
+  contactHref: string;
+  bookLabel: string;
+  bookHref: string;
+};
+
+export function SiteHeader({
+  nav,
+  brandName,
+  logoAbbr,
+  contactLabel,
+  contactHref,
+  bookLabel,
+  bookHref,
+}: SiteHeaderProps) {
   const [scrolled, setScrolled] = React.useState(false);
   const [open, setOpen] = React.useState(false);
   const [hovered, setHovered] = React.useState<string | null>(null);
@@ -48,13 +66,13 @@ export function SiteHeader() {
         >
           <Link href="/" className="flex items-center gap-2 font-display text-[20px] tracking-tight text-ink">
             <span aria-hidden className="grid h-8 w-8 place-items-center rounded-full bg-ink text-on-dark font-sans text-[12px] font-semibold">
-              DS
+              {logoAbbr}
             </span>
-            <span>DigSolutions</span>
+            <span>{brandName}</span>
           </Link>
 
           <nav className="hidden lg:flex items-center gap-1" onMouseLeave={() => setHovered(null)}>
-            {primaryNav.map((item) => {
+            {nav.map((item) => {
               const hasChildren = !!item.children?.length;
               const isActive = hovered === item.label;
               return (
@@ -105,8 +123,12 @@ export function SiteHeader() {
           </nav>
 
           <div className="hidden lg:flex items-center gap-2">
-            <Button href="/contact" variant="ghost" size="sm">Contact</Button>
-            <Button href="/book-consultation" size="sm">Book consultation</Button>
+            <Button href={contactHref} variant="ghost" size="sm">
+              {contactLabel}
+            </Button>
+            <Button href={bookHref} size="sm">
+              {bookLabel}
+            </Button>
           </div>
 
           <button
@@ -144,7 +166,7 @@ export function SiteHeader() {
             >
               <div className="nav-panel rounded-2xl p-4">
                 <nav className="grid gap-1">
-                  {primaryNav.map((item) => {
+                  {nav.map((item) => {
                     const hasChildren = !!item.children?.length;
                     const isExpanded = expandedMobile === item.label;
 
@@ -204,11 +226,11 @@ export function SiteHeader() {
                   })}
                 </nav>
                 <div className="mt-3 grid grid-cols-2 gap-2 border-t border-hairline pt-3">
-                  <Button href="/contact" variant="outline" size="sm" className="w-full">
-                    Contact
+                  <Button href={contactHref} variant="outline" size="sm" className="w-full">
+                    {contactLabel}
                   </Button>
-                  <Button href="/book-consultation" size="sm" className="w-full">
-                    Book consultation
+                  <Button href={bookHref} size="sm" className="w-full">
+                    {bookLabel}
                   </Button>
                 </div>
               </div>

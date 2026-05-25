@@ -3,20 +3,27 @@
 import * as React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { testimonials } from "@/lib/content/testimonials";
+import type { Testimonial } from "@/lib/content/testimonials";
 import { cn } from "@/lib/utils";
 
-export function TestimonialCarousel() {
+type Props = {
+  items: Testimonial[];
+};
+
+export function TestimonialCarousel({ items }: Props) {
   const [idx, setIdx] = React.useState(0);
   const [paused, setPaused] = React.useState(false);
+  const count = items.length;
 
   React.useEffect(() => {
-    if (paused) return;
-    const t = setInterval(() => setIdx((i) => (i + 1) % testimonials.length), 6000);
+    if (paused || count < 2) return;
+    const t = setInterval(() => setIdx((i) => (i + 1) % count), 6000);
     return () => clearInterval(t);
-  }, [paused]);
+  }, [paused, count]);
 
-  const current = testimonials[idx];
+  if (count === 0) return null;
+
+  const current = items[idx % count];
 
   return (
     <div
@@ -57,13 +64,13 @@ export function TestimonialCarousel() {
       <div className="mt-6 flex items-center justify-center gap-3">
         <button
           aria-label="Previous testimonial"
-          onClick={() => setIdx((i) => (i - 1 + testimonials.length) % testimonials.length)}
+          onClick={() => setIdx((i) => (i - 1 + count) % count)}
           className="grid h-9 w-9 place-items-center rounded-full border border-hairline-strong text-ink hover:bg-surface-strong transition"
         >
           <ChevronLeft className="h-4 w-4" />
         </button>
         <div className="flex gap-1.5">
-          {testimonials.map((_, i) => (
+          {items.map((_, i) => (
             <button
               key={i}
               onClick={() => setIdx(i)}
@@ -77,7 +84,7 @@ export function TestimonialCarousel() {
         </div>
         <button
           aria-label="Next testimonial"
-          onClick={() => setIdx((i) => (i + 1) % testimonials.length)}
+          onClick={() => setIdx((i) => (i + 1) % count)}
           className="grid h-9 w-9 place-items-center rounded-full border border-hairline-strong text-ink hover:bg-surface-strong transition"
         >
           <ChevronRight className="h-4 w-4" />

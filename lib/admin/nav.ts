@@ -13,6 +13,7 @@ import {
   Settings,
   Activity,
   BarChart3,
+  PanelsTopLeft,
 } from "lucide-react";
 
 export type AdminNavItem = {
@@ -59,6 +60,7 @@ export const adminNav: AdminNavGroup[] = [
   {
     label: "Workspace",
     items: [
+      { href: "/admin/page-sections", label: "Page sections", icon: PanelsTopLeft },
       { href: "/admin/users", label: "Users & roles", icon: UserCog },
       { href: "/admin/settings", label: "Settings", icon: Settings },
     ],

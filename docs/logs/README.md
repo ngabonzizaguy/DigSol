@@ -12,6 +12,7 @@ This folder is the running memory of the build. Every meaningful decision, insta
 
 ## Quick links
 
+- **[Project status (read first)](./PROJECT_STATUS.md)** — done / not done / next for all agents
 - [Stack](./stack.md)
 - [Decisions](./decisions.md)
 - [Lessons](./lessons.md)

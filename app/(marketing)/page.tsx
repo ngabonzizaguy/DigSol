@@ -1,161 +1,185 @@
 import { Container, Section } from "@/components/ui/container";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { HomeHero } from "@/components/marketing/hero";
+import { HomeHero } from "@/components/marketing/home-hero";
+import { HomeHeroPreview } from "@/components/marketing/home-hero-preview";
 import { LogoMarquee } from "@/components/marketing/logo-marquee";
 import { StatCounter } from "@/components/marketing/stat-counter";
-import { SectionHeading } from "@/components/marketing/section-heading";
+import { CmsSectionHeading } from "@/components/marketing/cms-section-heading";
 import { ServiceCard } from "@/components/marketing/service-card";
-import { FeaturesGrid } from "@/components/marketing/features-grid";
-import { ProcessStepper } from "@/components/marketing/process-stepper";
+import { CmsHomeFeaturesGrid, CmsProcessStepper } from "@/components/marketing/cms-blocks";
 import { CaseStudyCard } from "@/components/marketing/case-study-card";
 import { TestimonialCarousel } from "@/components/marketing/testimonial-carousel";
-import { PricingCard, pricingTiers } from "@/components/marketing/pricing-card";
+import { PricingCard } from "@/components/marketing/pricing-card";
+import { getPricingTiersForMarketing } from "@/lib/marketing/pricing-tiers";
 import { CtaBand } from "@/components/marketing/cta-band";
 import { FadeIn, StaggerChildren, StaggerItem } from "@/components/marketing/fade-in";
-import { services } from "@/lib/content/services";
-import { caseStudies } from "@/lib/content/work";
-import { stats } from "@/lib/site";
+import { PageSection } from "@/components/marketing/page-section";
+import { getServices, getCaseStudies, getTestimonials } from "@/lib/content/fetchers";
+import { getPageSectionsStore } from "@/lib/marketing/page-sections-server";
+import { getSectionContent } from "@/lib/marketing/page-sections-store";
+import type { CtaBandContent, HomeHeroContent, HomeHeroPreviewContent, HomeTrustContent, SectionHeadingContent } from "@/lib/marketing/home-content";
 import { ArrowRight } from "lucide-react";
 
-export default function HomePage() {
+export default async function HomePage() {
+  const store = await getPageSectionsStore();
+  const [services, caseStudies, testimonials] = await Promise.all([
+    getServices(),
+    getCaseStudies(),
+    getTestimonials(),
+  ]);
+
+  const hero = getSectionContent<HomeHeroContent>(store, "home", "hero");
+  const preview = getSectionContent<HomeHeroPreviewContent>(store, "home", "hero_preview_card");
+  const trust = getSectionContent<HomeTrustContent>(store, "home", "trust");
+  const servicesHead = getSectionContent<SectionHeadingContent>(store, "home", "services");
+  const featuresContent = getSectionContent(store, "home", "features");
+  const processContent = getSectionContent(store, "home", "process");
+  const portfolioHead = getSectionContent<SectionHeadingContent>(store, "home", "portfolio");
+  const testimonialsHead = getSectionContent<SectionHeadingContent>(store, "home", "testimonials");
+  const pricingContent = getSectionContent<SectionHeadingContent>(store, "home", "pricing");
+  const tiers = await getPricingTiersForMarketing();
+  const cta = getSectionContent<CtaBandContent>(store, "home", "cta_band");
+
   const featuredCases = caseStudies.slice(0, 3);
+  const stats = (trust.stats ?? []).filter((s) => s.value?.trim() && s.label?.trim());
 
   return (
     <>
-      <HomeHero />
+      <PageSection pageId="home" sectionId="hero">
+        <HomeHero content={hero} />
+      </PageSection>
 
-      {/* Trust */}
-      <section className="relative border-y border-hairline bg-canvas-soft py-14 lg:py-16">
-        <Container>
-          <FadeIn>
-            <p className="text-center text-[12px] font-semibold uppercase tracking-[0.14em] text-muted mb-10">
-              Trusted by teams shipping real digital work
-            </p>
-          </FadeIn>
-          <LogoMarquee />
-          <div className="mt-12 grid grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12 pt-12 border-t border-hairline">
-            {stats.map((s, i) => (
-              <StatCounter key={s.label} value={s.value} label={s.label} delay={i * 0.08} />
-            ))}
-          </div>
-        </Container>
-      </section>
+      <PageSection pageId="home" sectionId="hero_preview_card">
+        <HomeHeroPreview content={preview} />
+      </PageSection>
 
-      {/* Services */}
-      <Section>
-        <Container>
-          <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 mb-12">
-            <SectionHeading
-              eyebrow="What we do"
-              title="One partner for the entire digital stack."
-              subtitle="From strategy and brand to AI, CRM, payments, and cloud — we deliver the complete digital transformation surface for your business."
-            />
-            <Button href="/solutions" variant="outline" className="self-start lg:self-end">
-              View all solutions <ArrowRight className="h-4 w-4" />
-            </Button>
-          </div>
-          <StaggerChildren className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-5">
-            {services.map((s) => (
-              <StaggerItem key={s.slug}>
-                <ServiceCard service={s} />
-              </StaggerItem>
-            ))}
-          </StaggerChildren>
-        </Container>
-      </Section>
+      <PageSection pageId="home" sectionId="trust">
+        <section className="relative border-y border-hairline bg-canvas-soft py-14 lg:py-16">
+          <Container>
+            {trust.label?.trim() ? (
+              <FadeIn>
+                <p className="mb-10 text-center text-[12px] font-semibold uppercase tracking-[0.14em] text-muted">
+                  {trust.label}
+                </p>
+              </FadeIn>
+            ) : null}
+            <LogoMarquee />
+            {stats.length > 0 ? (
+              <div className="mt-12 grid grid-cols-2 gap-8 border-t border-hairline pt-12 lg:grid-cols-4 lg:gap-12">
+                {stats.map((s, i) => (
+                  <StatCounter key={`${s.label}-${i}`} value={s.value!} label={s.label!} delay={i * 0.08} />
+                ))}
+              </div>
+            ) : null}
+          </Container>
+        </section>
+      </PageSection>
 
-      {/* Features / Differentiators */}
-      <Section className="bg-canvas-soft border-y border-hairline">
-        <Container>
-          <SectionHeading
-            eyebrow="Why DigSolutions"
-            title="Premium agency breadth with SaaS-grade client experience."
-            subtitle="We took the parts of consulting, agencies, and product teams that work — and dropped the parts that don't."
-            className="mb-12"
-          />
-          <FeaturesGrid />
-        </Container>
-      </Section>
+      <PageSection pageId="home" sectionId="services">
+        <Section>
+          <Container>
+            <div className="mb-12 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+              <CmsSectionHeading content={servicesHead} />
+              {services.length > 0 ? (
+                <Button href="/solutions" variant="outline" className="self-start lg:self-end">
+                  View all solutions <ArrowRight className="h-4 w-4" />
+                </Button>
+              ) : null}
+            </div>
+            {services.length > 0 ? (
+              <StaggerChildren className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4 lg:gap-5">
+                {services.map((s) => (
+                  <StaggerItem key={s.slug}>
+                    <ServiceCard service={s} />
+                  </StaggerItem>
+                ))}
+              </StaggerChildren>
+            ) : null}
+          </Container>
+        </Section>
+      </PageSection>
 
-      {/* Process */}
-      <Section>
-        <Container>
-          <SectionHeading
-            eyebrow="How we work"
-            title="A disciplined five-stage method."
-            subtitle="Each stage is short, measurable, and produces a tangible artefact your team can review and act on."
-            className="mb-14"
-          />
-          <ProcessStepper />
-          <FadeIn className="mt-10">
-            <Button href="/how-we-work" variant="ghost">
-              Read the full methodology <ArrowRight className="h-4 w-4" />
-            </Button>
-          </FadeIn>
-        </Container>
-      </Section>
+      <PageSection pageId="home" sectionId="features">
+        <Section className="border-y border-hairline bg-canvas-soft">
+          <Container>
+            <CmsSectionHeading content={featuresContent} className="mb-12" />
+            <CmsHomeFeaturesGrid content={featuresContent} />
+          </Container>
+        </Section>
+      </PageSection>
 
-      {/* Portfolio */}
-      <Section className="bg-canvas-soft border-y border-hairline">
-        <Container>
-          <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 mb-12">
-            <SectionHeading
-              eyebrow="Selected work"
-              title="Outcomes, not output."
-              subtitle="A taste of recent engagements across SMB, mid-market, and enterprise."
-            />
-            <Button href="/work" variant="outline" className="self-start lg:self-end">
-              View all work <ArrowRight className="h-4 w-4" />
-            </Button>
-          </div>
-          <StaggerChildren className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-            {featuredCases.map((c, i) => (
-              <StaggerItem key={c.slug} className={i === 0 ? "lg:col-span-2" : ""}>
-                <CaseStudyCard study={c} featured={i === 0} />
-              </StaggerItem>
-            ))}
-          </StaggerChildren>
-        </Container>
-      </Section>
+      <PageSection pageId="home" sectionId="process">
+        <Section>
+          <Container>
+            <CmsSectionHeading content={processContent} className="mb-14" />
+            <CmsProcessStepper content={processContent} showLink />
+          </Container>
+        </Section>
+      </PageSection>
 
-      {/* Testimonials */}
-      <Section>
-        <Container>
-          <SectionHeading
-            eyebrow="Word of mouth"
-            title="The kind of partner clients keep on retainer."
-            align="center"
-            className="mb-12"
-          />
-          <TestimonialCarousel />
-        </Container>
-      </Section>
+      <PageSection pageId="home" sectionId="portfolio">
+        <Section className="border-y border-hairline bg-canvas-soft">
+          <Container>
+            <div className="mb-12 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+              <CmsSectionHeading content={portfolioHead} />
+              {featuredCases.length > 0 ? (
+                <Button href="/work" variant="outline" className="self-start lg:self-end">
+                  View all work <ArrowRight className="h-4 w-4" />
+                </Button>
+              ) : null}
+            </div>
+            {featuredCases.length > 0 ? (
+              <StaggerChildren className="grid grid-cols-1 gap-5 lg:grid-cols-2">
+                {featuredCases.map((c, i) => (
+                  <StaggerItem key={c.slug} className={i === 0 ? "lg:col-span-2" : ""}>
+                    <CaseStudyCard study={c} featured={i === 0} />
+                  </StaggerItem>
+                ))}
+              </StaggerChildren>
+            ) : null}
+          </Container>
+        </Section>
+      </PageSection>
 
-      {/* Pricing */}
-      <Section className="bg-canvas-soft border-y border-hairline">
-        <Container>
-          <SectionHeading
-            eyebrow="Engagement models"
-            title="From single projects to multi-year platforms."
-            subtitle="Clear starting prices. Custom scoping. Every engagement begins with a free 30-minute consultation."
-            align="center"
-            className="mb-14"
-          />
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 lg:gap-6">
-            {pricingTiers.map((t) => (
-              <PricingCard key={t.name} tier={t} />
-            ))}
-          </div>
-          <FadeIn className="mt-8 text-center">
-            <p className="text-[14px] text-muted">
-              Need something else? <a href="/contact" className="text-ink underline underline-offset-4">Talk to us</a>.
-            </p>
-          </FadeIn>
-        </Container>
-      </Section>
+      <PageSection pageId="home" sectionId="testimonials">
+        <Section>
+          <Container>
+            <CmsSectionHeading content={testimonialsHead} align="center" className="mb-12" />
+            {testimonials.length > 0 ? <TestimonialCarousel items={testimonials} /> : null}
+          </Container>
+        </Section>
+      </PageSection>
 
-      <CtaBand />
+      <PageSection pageId="home" sectionId="pricing">
+        {tiers.length > 0 ? (
+          <Section className="border-y border-hairline bg-canvas-soft">
+            <Container>
+              <CmsSectionHeading content={pricingContent} align="center" className="mb-14" />
+              <div className="grid grid-cols-1 gap-5 lg:grid-cols-3 lg:gap-6">
+                {tiers.map((t) => (
+                  <PricingCard key={t.name} tier={t} />
+                ))}
+              </div>
+              <FadeIn className="mt-8 text-center">
+                <p className="text-[14px] text-muted">
+                  Need something else? <a href="/contact" className="text-ink underline underline-offset-4">Talk to us</a>.
+                </p>
+              </FadeIn>
+            </Container>
+          </Section>
+        ) : null}
+      </PageSection>
+
+      <PageSection pageId="home" sectionId="cta_band">
+        <CtaBand
+          title={cta.title}
+          subtitle={cta.subtitle}
+          primaryLabel={cta.primary_label}
+          primaryHref={cta.primary_href}
+          secondaryLabel={cta.secondary_label}
+          secondaryHref={cta.secondary_href}
+        />
+      </PageSection>
     </>
   );
 }

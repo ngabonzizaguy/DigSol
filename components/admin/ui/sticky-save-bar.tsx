@@ -23,9 +23,9 @@ export function StickySaveBar({
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: 60, opacity: 0 }}
           transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
-          className="fixed bottom-4 left-1/2 z-50 -translate-x-1/2"
+          className="fixed bottom-4 left-3 right-3 z-50 sm:left-1/2 sm:right-auto sm:-translate-x-1/2"
         >
-          <div className="flex items-center gap-3 rounded-full border border-admin-border bg-admin-surface px-4 py-2 shadow-lift">
+          <div className="mx-auto flex max-w-lg flex-wrap items-center justify-center gap-2 rounded-full border border-admin-border bg-admin-surface px-4 py-2 shadow-lift sm:flex-nowrap sm:gap-3">
             <span className="text-[12px] text-admin-fg-muted">{message ?? "You have unsaved changes"}</span>
             {onDiscard ? (
               <Button variant="ghost" size="xs" onClick={onDiscard}>

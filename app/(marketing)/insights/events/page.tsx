@@ -1,49 +1,56 @@
 import type { Metadata } from "next";
 import { Container, Section } from "@/components/ui/container";
-import { PageHero } from "@/components/marketing/page-hero";
+import { CmsPageHero } from "@/components/marketing/cms-page-hero";
 import { CtaBand } from "@/components/marketing/cta-band";
 import { Breadcrumbs } from "@/components/marketing/breadcrumbs";
-import { Card, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Calendar } from "lucide-react";
+import { CmsEventGrid } from "@/components/marketing/cms-blocks";
+import { PageSection } from "@/components/marketing/page-section";
+import { loadMarketingPageStore, pageCtaContent, pageHeroContent } from "@/lib/marketing/marketing-page-content";
+import { getSectionContent } from "@/lib/marketing/page-sections-store";
 
 export const metadata: Metadata = {
   title: "Events",
   description: "Webinars, briefings, and meetups hosted by DigSolutions.",
 };
 
-const events = [
-  { date: "Jun 12, 2026", title: "AI agents in production — the operating model", type: "Webinar", spots: "Free" },
-  { date: "Jul 03, 2026", title: "Executive briefing: regional digital transformation", type: "Briefing", spots: "Invite only" },
-  { date: "Aug 21, 2026", title: "Designing B2B products that feel consumer-grade", type: "Meetup", spots: "Kigali" },
-];
+export default async function EventsPage() {
+  const store = await loadMarketingPageStore();
+  const hero = pageHeroContent(store, "insights_events");
+  const events = getSectionContent(store, "insights_events", "events_list");
+  const cta = pageCtaContent(store, "insights_events");
 
-export default function EventsPage() {
   return (
     <>
-      <PageHero
-        eyebrow="Events"
-        title="Where we'll be next."
-        subtitle="A small, deliberate calendar of webinars, executive briefings, and in-person meetups."
-      />
-      <Section>
-        <Container>
-          <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: "Insights", href: "/insights" }, { label: "Events" }]} />
-          <div className="mt-10 grid grid-cols-1 md:grid-cols-3 gap-5">
-            {events.map((e) => (
-              <Card key={e.title}>
-                <Badge>{e.type}</Badge>
-                <div className="mt-4 flex items-center gap-2 text-[13px] text-muted">
-                  <Calendar className="h-3.5 w-3.5" /> {e.date}
-                </div>
-                <CardTitle className="mt-3">{e.title}</CardTitle>
-                <p className="mt-4 text-[13px] uppercase tracking-wider text-muted">{e.spots}</p>
-              </Card>
-            ))}
-          </div>
-        </Container>
-      </Section>
-      <CtaBand />
+      <PageSection pageId="insights_events" sectionId="hero">
+        <CmsPageHero {...hero} />
+      </PageSection>
+
+      <PageSection pageId="insights_events" sectionId="breadcrumbs">
+        <Section className="pb-0">
+          <Container>
+            <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: "Insights", href: "/insights" }, { label: "Events" }]} />
+          </Container>
+        </Section>
+      </PageSection>
+
+      <PageSection pageId="insights_events" sectionId="events_list">
+        <Section>
+          <Container>
+            <CmsEventGrid content={events} />
+          </Container>
+        </Section>
+      </PageSection>
+
+      <PageSection pageId="insights_events" sectionId="cta_band">
+        <CtaBand
+          title={cta.title}
+          subtitle={cta.subtitle}
+          primaryLabel={cta.primary_label}
+          primaryHref={cta.primary_href}
+          secondaryLabel={cta.secondary_label}
+          secondaryHref={cta.secondary_href}
+        />
+      </PageSection>
     </>
   );
 }

@@ -1,73 +1,71 @@
 import type { Metadata } from "next";
 import { Container, Section } from "@/components/ui/container";
-import { PageHero } from "@/components/marketing/page-hero";
+import { CmsPageHero } from "@/components/marketing/cms-page-hero";
 import { CtaBand } from "@/components/marketing/cta-band";
 import { Breadcrumbs } from "@/components/marketing/breadcrumbs";
 import { FadeIn } from "@/components/marketing/fade-in";
-
-const faqs = [
-  {
-    q: "What size companies do you work with?",
-    a: "Everything from 5-person businesses to 5,000-person enterprises. Our engagement models scale from fixed-scope Launch projects through multi-quarter Enterprise programs.",
-  },
-  {
-    q: "How long does a typical project take?",
-    a: "SMB projects run 4–8 weeks. Mid-market engagements are typically 3–6 months. Enterprise programs run 6–24 months in coordinated workstreams.",
-  },
-  {
-    q: "Do you work on retainer?",
-    a: "Yes — most clients stay on a retainer after launch for ongoing optimisation, hosting, and net-new work. Retainers start at $4,900/month.",
-  },
-  {
-    q: "Can you sign NDAs and MSAs?",
-    a: "Absolutely. We sign mutual NDAs before any technical discussion, and we work under client MSAs as well as our own.",
-  },
-  {
-    q: "Where is your team based?",
-    a: "We're a distributed team headquartered in Kigali with operations in London. The team covers four continents.",
-  },
-  {
-    q: "Do you guarantee outcomes?",
-    a: "We guarantee process and craft. We can't guarantee market outcomes, but we'll commit to measurable milestones and we share progress weekly.",
-  },
-  {
-    q: "Will senior people actually work on my project?",
-    a: "Yes. The people listed on our Leadership page are on every engagement by design. No bait-and-switch.",
-  },
-  {
-    q: "What's your stance on AI?",
-    a: "Tasteful and useful. Every engagement ships at least one production AI workflow, monitored like any other piece of software. We're allergic to AI theatre.",
-  },
-];
+import { PageSection } from "@/components/marketing/page-section";
+import { loadMarketingPageStore, pageCtaContent, pageHeroContent } from "@/lib/marketing/marketing-page-content";
+import { getSectionContent } from "@/lib/marketing/page-sections-store";
 
 export const metadata: Metadata = {
   title: "FAQ",
   description: "Common questions about how we work, pricing, and engagement.",
 };
 
-export default function FaqPage() {
+export default async function FaqPage() {
+  const store = await loadMarketingPageStore();
+  const hero = pageHeroContent(store, "faq");
+  const cta = pageCtaContent(store, "faq");
+  const faqBlock = getSectionContent<{ faqs?: { q?: string; a?: string }[] }>(store, "faq", "faq_list");
+  const faqs = (faqBlock.faqs ?? []).filter((f) => f.q?.trim() && f.a?.trim());
+
   return (
     <>
-      <PageHero eyebrow="FAQ" title="Common questions, plain answers." />
-      <Section>
-        <Container className="max-w-3xl">
-          <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: "FAQ" }]} />
-          <div className="mt-10 space-y-4">
-            {faqs.map((f, i) => (
-              <FadeIn key={f.q} delay={i * 0.04}>
-                <details className="group rounded-2xl border border-hairline bg-surface-card p-6 lg:p-7 transition-all hover:border-hairline-strong">
-                  <summary className="cursor-pointer list-none flex items-start justify-between gap-6 font-display text-[20px] text-ink">
-                    {f.q}
-                    <span className="font-sans text-2xl text-muted transition-transform group-open:rotate-45">+</span>
-                  </summary>
-                  <p className="mt-4 text-[15.5px] text-body leading-relaxed">{f.a}</p>
-                </details>
-              </FadeIn>
-            ))}
-          </div>
-        </Container>
-      </Section>
-      <CtaBand />
+      <PageSection pageId="faq" sectionId="hero">
+        <CmsPageHero {...hero} />
+      </PageSection>
+
+      <PageSection pageId="faq" sectionId="breadcrumbs">
+        <Section className="pb-0">
+          <Container className="max-w-3xl">
+            <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: "FAQ" }]} />
+          </Container>
+        </Section>
+      </PageSection>
+
+      <PageSection pageId="faq" sectionId="faq_list">
+        <Section>
+          <Container className="max-w-3xl">
+            {faqs.length > 0 ? (
+            <div className="space-y-4">
+              {faqs.map((f, i) => (
+                <FadeIn key={f.q} delay={i * 0.04}>
+                  <details className="group rounded-2xl border border-hairline bg-surface-card p-6 transition-all hover:border-hairline-strong lg:p-7">
+                    <summary className="flex cursor-pointer list-none items-start justify-between gap-6 font-display text-[20px] text-ink">
+                      {f.q}
+                      <span className="font-sans text-2xl text-muted transition-transform group-open:rotate-45">+</span>
+                    </summary>
+                    <p className="mt-4 text-[15.5px] leading-relaxed text-body">{f.a}</p>
+                  </details>
+                </FadeIn>
+              ))}
+            </div>
+            ) : null}
+          </Container>
+        </Section>
+      </PageSection>
+
+      <PageSection pageId="faq" sectionId="cta_band">
+        <CtaBand
+          title={cta.title}
+          subtitle={cta.subtitle}
+          primaryLabel={cta.primary_label}
+          primaryHref={cta.primary_href}
+          secondaryLabel={cta.secondary_label}
+          secondaryHref={cta.secondary_href}
+        />
+      </PageSection>
     </>
   );
 }

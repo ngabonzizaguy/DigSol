@@ -1,0 +1,29 @@
+---
+description: Mandatory project status log — read before tasks; update after work. Prevents stale session/blocker confusion.
+alwaysApply: true
+---
+
+# Project status log (mandatory)
+
+## Before any task
+
+1. Read **`docs/logs/PROJECT_STATUS.md`** end-to-end.
+2. Treat it as the **source of truth** for what is done, not done, and planned next.
+3. Do **not** infer project state from older files alone (`blockers.md`, `2026-05-22-cms.md`, `.ai-memory/agent-notes.md`) without cross-checking the repo and this status file.
+4. For Supabase/env: verify on disk (e.g. `.env.local` exists — it is gitignored) and/or Supabase MCP — never assume from outdated logs.
+
+## After any feature or modification
+
+Update **`docs/logs/PROJECT_STATUS.md`**:
+
+- Move completed items to **Done** with date if helpful.
+- Adjust **Not done** and **Next** to match reality.
+- Add a row under **Do not trust without checking** if a doc misled you.
+
+## Spawned / parallel agents
+
+Every subagent or new session on this repo must follow the same protocol: **read PROJECT_STATUS.md first**, update it before handoff.
+
+## Design system
+
+UI work still follows **`.cursor/rules/design-system.mdc`** and `tailwind.config.ts`. Root `DESIGN.md` was removed from the repo; do not reintroduce conflicting token sources.

@@ -8,6 +8,7 @@ export function FormField({
   error,
   required,
   className,
+  labelClassName,
   children,
 }: {
   label: string;
@@ -15,11 +16,12 @@ export function FormField({
   error?: string;
   required?: boolean;
   className?: string;
+  labelClassName?: string;
   children: React.ReactNode;
 }) {
   return (
     <div className={cn("space-y-1.5", className)}>
-      <Label className="flex items-center gap-1">
+      <Label className={cn("flex items-center gap-1", labelClassName)}>
         {label}
         {required ? <span className="text-error">*</span> : null}
       </Label>

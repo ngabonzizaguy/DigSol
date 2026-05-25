@@ -19,7 +19,7 @@ export function AdminShell({
             <AdminSidebar />
             <div className="flex min-w-0 flex-1 flex-col">
               <AdminTopbar user={user} />
-              <main className="flex-1 px-3 py-4 md:px-6 md:py-6">{children}</main>
+              <main className="flex-1 overflow-x-hidden px-3 py-4 md:px-6 md:py-6">{children}</main>
             </div>
           </div>
         </CommandPalette>

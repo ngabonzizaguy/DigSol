@@ -8,4 +8,12 @@ out
 .vercel
 .turbo
 .cache
+*.tsbuildinfo
 .cursor/settings.json
+
+# Local AI agent workspace (never commit — stays on machine only)
+agents/
+context/
+.ai-memory/
+.cursor/skills/
+AGENTS.md

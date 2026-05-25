@@ -1,0 +1,94 @@
+---
+description: >-
+  Mandatory agent workspace bootstrap — load context, memory, skills, and
+  orchestration rules before ANY task. Works alongside design-system and other rules.
+alwaysApply: true
+---
+
+# Agent Workspace — Mandatory Load Protocol
+
+Before executing **any** task in this repository, follow this protocol completely. No step may be skipped.
+
+## 0. Project status log (Required — first read)
+
+Read **`docs/logs/PROJECT_STATUS.md`** for what is **done**, **not done**, and **next**. This overrides stale session logs (e.g. old Supabase blockers). Update that file after every completed task. See **`.cursor/rules/project-status-log.mdc`**.
+
+## 1. Load Context (Required)
+
+Read these files in order:
+
+1. `context/project-overview.md`
+2. `context/architecture.md`
+3. `context/tech-stack.md`
+4. `context/coding-standards.md`
+
+If any file is missing or clearly stale, **stop** and run the **`repository-analyzer`** skill (`.cursor/skills/repository-analyzer/SKILL.md`) before proceeding.
+
+## 2. Load Memory (Required)
+
+Scan before coding:
+
+- `.ai-memory/decisions.md`
+- `.ai-memory/architecture-decisions.md`
+- `.ai-memory/lessons-learned.md`
+- `.ai-memory/agent-notes.md` (for in-progress handoffs)
+
+## 3. Load Orchestration (Required)
+
+Read `AGENTS.md` at repo root for:
+
+- Task → agent delegation matrix
+- Skill trigger conditions
+- Parallel agent boundaries
+- Self-documentation requirements
+
+Identify the **primary agent** for the current task from `agents/*.md`.
+
+## 4. Activate Skills
+
+Load relevant skills from `.cursor/skills/<name>/SKILL.md`:
+
+| Situation | Skill |
+|-----------|-------|
+| New workspace / repo changed / context missing | `repository-analyzer` |
+| New feature | `feature-builder` |
+| API or external integration | `api-integration` |
+| Bug or error | `bug-investigator` |
+| Refactor | `refactor-assistant` |
+| Tests or QA | `test-generator` |
+| After any completed work | `documentation-writer` |
+
+## 5. Execution Rules
+
+- **Plan before code** — outline steps and file boundaries.
+- **Minimal scope** — do not modify unrelated modules.
+- **Follow architecture** — route groups, Supabase RLS, revalidatePath, design system.
+- **Verify** — lint/build evidence before claiming done.
+- **Commit** — only when user explicitly requests.
+
+## 6. Post-Task (Required)
+
+After every feature or modification:
+
+1. Run **`documentation-writer`** skill
+2. Update affected `context/*.md` files
+3. Append `.ai-memory/` (decisions, lessons, or agent-notes)
+4. Update committed docs/README only when user requests
+
+## 7. Parallel Agents
+
+When work spans frontend + backend + testing:
+
+- Project Manager (`agents/project-manager.md`) coordinates
+- Respect file boundaries in `AGENTS.md`
+- Log handoffs in `.ai-memory/agent-notes.md`
+
+## Coexistence With Other Rules
+
+This rule **supplements** (does not replace):
+
+- `.cursor/rules/design-system.mdc` — UI changes
+- User rules — git safety, commit policy, prose standards
+- Installed Cursor plugin skills — use when task-specific; still load context first
+
+**Context and memory load always come first.**

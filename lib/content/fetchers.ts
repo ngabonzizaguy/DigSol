@@ -1,7 +1,7 @@
 // Server-side content fetchers — try Supabase first, fall back to local static data.
 // Returns shape compatible with the existing marketing pages (which consume the local exports).
 import "server-only";
-import { createClient } from "@/lib/supabase/server";
+import { createPublicClient } from "@/lib/supabase/public";
 import { services as _services } from "@/lib/content/services";
 import { industries as _industries } from "@/lib/content/industries";
 import { caseStudies as _caseStudies } from "@/lib/content/work";
@@ -11,8 +11,34 @@ import { leadership as _leadership, openRoles as _openRoles } from "@/lib/conten
 
 const hasSupabase = () => Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
 
+type Service = (typeof _services)[number];
+type CaseStudy = (typeof _caseStudies)[number];
+
+function getClient() {
+  return createPublicClient();
+}
+
+function normalizeService(row: Service): Service {
+  return {
+    ...row,
+    outcomes: Array.isArray(row.outcomes) ? row.outcomes : [],
+    deliverables: Array.isArray(row.deliverables) ? row.deliverables : [],
+    capabilities: Array.isArray(row.capabilities) ? row.capabilities : [],
+  };
+}
+
+function normalizeCaseStudy(row: CaseStudy): CaseStudy {
+  return {
+    ...row,
+    services: Array.isArray(row.services) ? row.services : [],
+    metrics: Array.isArray(row.metrics) ? row.metrics : [],
+  };
+}
+
 async function tryFetch<T>(thenable: PromiseLike<{ data: unknown[] | null; error: unknown }>, fallback: T[]): Promise<T[]> {
   if (!hasSupabase()) return fallback;
+  const supabase = getClient();
+  if (!supabase) return fallback;
   try {
     const { data, error } = await thenable;
     if (error || !data || data.length === 0) return fallback;
@@ -24,11 +50,12 @@ async function tryFetch<T>(thenable: PromiseLike<{ data: unknown[] | null; error
 
 // ---------- Services ----------
 export async function getServices() {
-  const supabase = await createClient();
-  return tryFetch(
+  const supabase = getClient()!;
+  const rows = await tryFetch(
     supabase.from("services").select("*").eq("status", "published").order("sort_order").order("title"),
     _services,
   );
+  return rows.map(normalizeService);
 }
 export async function getService(slug: string) {
   const list = await getServices();
@@ -37,7 +64,7 @@ export async function getService(slug: string) {
 
 // ---------- Industries ----------
 export async function getIndustries() {
-  const supabase = await createClient();
+  const supabase = getClient()!;
   return tryFetch(
     supabase.from("industries").select("*").eq("status", "published").order("sort_order").order("name"),
     _industries,
@@ -50,8 +77,8 @@ export async function getIndustry(slug: string) {
 
 // ---------- Case studies ----------
 export async function getCaseStudies() {
-  const supabase = await createClient();
-  return tryFetch(
+  const supabase = getClient()!;
+  const rows = await tryFetch(
     supabase
       .from("case_studies")
       .select("*")
@@ -60,6 +87,7 @@ export async function getCaseStudies() {
       .order("created_at", { ascending: false }),
     _caseStudies,
   );
+  return rows.map(normalizeCaseStudy);
 }
 export async function getCaseStudy(slug: string) {
   const list = await getCaseStudies();
@@ -98,7 +126,8 @@ function normalizeInsight(row: SupabaseInsightRow): LocalInsight {
 export async function getInsights(): Promise<LocalInsight[]> {
   if (!hasSupabase()) return _insights;
   try {
-    const supabase = await createClient();
+    const supabase = getClient();
+    if (!supabase) return _insights;
     const { data, error } = await supabase
       .from("insights")
       .select("*")
@@ -117,7 +146,7 @@ export async function getInsight(slug: string) {
 
 // ---------- Guides ----------
 export async function getGuides() {
-  const supabase = await createClient();
+  const supabase = getClient()!;
   return tryFetch(
     supabase.from("guides").select("*").eq("status", "published").order("sort_order"),
     _guides,
@@ -126,7 +155,7 @@ export async function getGuides() {
 
 // ---------- Testimonials ----------
 export async function getTestimonials() {
-  const supabase = await createClient();
+  const supabase = getClient()!;
   return tryFetch(
     supabase.from("testimonials").select("*").eq("status", "published").order("sort_order"),
     _testimonials,
@@ -138,7 +167,8 @@ type LocalTeamMember = (typeof _leadership)[number];
 export async function getLeadership(): Promise<LocalTeamMember[]> {
   if (!hasSupabase()) return _leadership;
   try {
-    const supabase = await createClient();
+    const supabase = getClient();
+    if (!supabase) return _leadership;
     const { data, error } = await supabase
       .from("team_members")
       .select("name, role, bio")
@@ -157,7 +187,8 @@ type SupabaseRoleRow = { slug: string; title: string; team: string; location: st
 export async function getOpenRoles(): Promise<LocalOpenRole[]> {
   if (!hasSupabase()) return _openRoles;
   try {
-    const supabase = await createClient();
+    const supabase = getClient();
+    if (!supabase) return _openRoles;
     const { data, error } = await supabase
       .from("open_roles")
       .select("slug, title, team, location, employment_type")

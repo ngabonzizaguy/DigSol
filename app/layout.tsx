@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, EB_Garamond, JetBrains_Mono } from "next/font/google";
 import { Toaster } from "sonner";
+import { getSiteSettings } from "@/lib/marketing/site-settings-server";
 import { site } from "@/lib/site";
 import "./globals.css";
 
@@ -23,29 +24,36 @@ const mono = JetBrains_Mono({
   display: "swap",
 });
 
-export const metadata: Metadata = {
-  metadataBase: new URL(site.url),
-  title: {
-    default: `${site.name} — ${site.tagline}`,
-    template: `%s — ${site.name}`,
-  },
-  description: site.description,
-  openGraph: {
-    type: "website",
-    url: site.url,
-    title: `${site.name} — ${site.tagline}`,
-    description: site.description,
-    siteName: site.name,
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: `${site.name} — ${site.tagline}`,
-    description: site.description,
-  },
-  icons: {
-    icon: "/favicon.ico",
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await getSiteSettings();
+  const name = settings.brand.name?.trim() || site.name;
+  const tagline = settings.brand.tagline?.trim() || site.tagline;
+  const description = settings.brand.description?.trim() || site.description;
+
+  return {
+    metadataBase: new URL(site.url),
+    title: {
+      default: `${name} — ${tagline}`,
+      template: `%s — ${name}`,
+    },
+    description,
+    openGraph: {
+      type: "website",
+      url: site.url,
+      title: `${name} — ${tagline}`,
+      description,
+      siteName: name,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${name} — ${tagline}`,
+      description,
+    },
+    icons: {
+      icon: "/favicon.ico",
+    },
+  };
+}
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
