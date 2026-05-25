@@ -102,6 +102,23 @@
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.6);
   }
 
+  /* Navigation — solid enough to stay readable over any page content */
+  .nav-shell {
+    background: rgba(255, 255, 255, 0.94);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid #e7e5e4;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+  }
+
+  .nav-panel {
+    background: #ffffff;
+    backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    border: 1px solid #e7e5e4;
+    box-shadow: 0 10px 32px rgba(0, 0, 0, 0.1);
+  }
+
   .glass-dark {
     background: rgba(28, 25, 23, 0.65);
     backdrop-filter: blur(20px) saturate(180%);
