@@ -3,7 +3,7 @@
 > **Read this file first in every agent session.**
 
 **Last updated:** 2026-05-26  
-**Active branch:** `main`  
+**Active branch:** `feature/phase-2-admin` (Phase 2 + ABCD polish; `main` at `c047c9a`)  
 **Supabase:** `DigSol` (`qfohxusczbvyoiqsxatl`) — live, `.env.local` configured (gitignored).  
 **Phase 2 detail:** [PHASE_2_PROGRESS.md](./PHASE_2_PROGRESS.md) · [2026-05-26-phase-2.md](./2026-05-26-phase-2.md)
 
@@ -26,7 +26,10 @@
 | **Phase 2 — AI (mock-first)** | `lib/ai`, lead assist, contact improve (CMS flag), analytics insight blurb |
 | **Phase 2 — RBAC (v1)** | Role presets, nav filter, route guard, `profiles.permissions` column |
 | **Phase 2 — Media (v1)** | Search, copy URL, `getMediaPublicUrl`, insight `cover_url` on marketing |
-| `npx tsc --noEmit` + `npm run build` | Passes (2026-05-26) |
+| **Phase 2 — ABCD polish** | Leads pipeline bar + inbox copy; analytics empty/layout; `CoverImageField` on insight/case study editors; users permission matrix modal |
+| **Analytics chart visual cleanup** | Ranked lists + single/multi-series radar charts; weekly device mix; period-split countries/funnel; fixed RGB token usage in Recharts |
+| **Admin nav icon fix** | Server layout passes role/permissions only; `filterNavForProfile` runs client-side (fixes `/admin` 500) |
+| `npx tsc --noEmit` + `npm run build` | Passes (2026-05-26, incl. ABCD polish) |
 
 ---
 
@@ -34,8 +37,6 @@
 
 | Item | Notes |
 |------|--------|
-| Users permission matrix UI | Presets enforced; no checkbox editor on `/admin/users` yet |
-| Media picker in entity editors | `MediaPickerDialog` exists; not wired to insight/case study forms |
 | Dashboard analytics mini-card | Analytics page only |
 | Real Resend / OpenAI keys | Mock by default; set env per [2026-05-26-phase-2.md](./2026-05-26-phase-2.md) |
 | Demo seed for sparse pageviews | Optional |
@@ -64,6 +65,6 @@
 
 ## Next (suggested)
 
-1. Wire `MediaPickerDialog` into insight/case study admin editors.
-2. Super-admin permission matrix on `/admin/users`.
-3. Smoke-test leads reply + activity log on production Supabase after migrations (applied 2026-05-26 via MCP).
+1. Manual smoke on `feature/phase-2-admin`: `/admin`, leads detail, analytics, media, users matrix.
+2. Merge `feature/phase-2-admin` → `main` when ready.
+3. Optional: dashboard analytics mini-card, demo pageview seed, real `RESEND_API_KEY` / `AI_API_KEY`.

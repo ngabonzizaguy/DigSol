@@ -82,8 +82,10 @@ export default async function LeadsListPage({
   return (
     <div className="space-y-4">
       <header>
-        <h1 className="text-[20px] font-semibold tracking-tight text-admin-fg">Leads</h1>
-        <p className="text-[13px] text-admin-fg-subtle">Form submissions with reply thread and pipeline status.</p>
+        <h1 className="text-[20px] font-semibold tracking-tight text-admin-fg">Leads inbox</h1>
+        <p className="mt-1 max-w-xl text-[13px] leading-relaxed text-admin-fg-subtle">
+          Contact forms, consultations, and newsletter signups. Open a lead to reply by email and track the conversation.
+        </p>
       </header>
 
       <Card>

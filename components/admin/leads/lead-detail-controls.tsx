@@ -73,7 +73,7 @@ export function LeadDetailControls({ lead }: { lead: Lead }) {
     <div className="space-y-4">
       <Card>
         <CardHeader><CardTitle>Status</CardTitle></CardHeader>
-        <CardContent className="grid grid-cols-2 gap-1.5">
+        <CardContent className="flex flex-wrap gap-1.5">
           {STATUSES.map((s) => (
             <Button
               key={s}
@@ -82,8 +82,9 @@ export function LeadDetailControls({ lead }: { lead: Lead }) {
               size="sm"
               disabled={pending}
               onClick={() => updateStatus(s)}
+              className="capitalize"
             >
-              {s}
+              {s.replace(/_/g, " ")}
             </Button>
           ))}
         </CardContent>

@@ -55,6 +55,19 @@ export const ROLE_PRESETS: Record<AdminRole, Partial<Record<AdminResource, Admin
 
 export type PermissionOverrides = Partial<Record<AdminResource, AdminAction[]>>;
 
+/** Human labels for the permissions matrix UI */
+export const PERMISSION_RESOURCES: { key: AdminResource; label: string; actions: AdminAction[] }[] = [
+  { key: "dashboard", label: "Dashboard", actions: ["read"] },
+  { key: "analytics", label: "Analytics", actions: ["read"] },
+  { key: "activity", label: "Activity log", actions: ["read"] },
+  { key: "content", label: "Content (services, insights, …)", actions: ["read", "create", "update", "delete", "publish"] },
+  { key: "leads", label: "Leads", actions: ["read", "update", "reply"] },
+  { key: "media", label: "Media library", actions: ["read", "create", "update", "delete"] },
+  { key: "page_sections", label: "Page sections", actions: ["read", "update"] },
+  { key: "users", label: "Users & roles", actions: ["read", "manage"] },
+  { key: "settings", label: "Site settings", actions: ["read", "update"] },
+];
+
 export function getEffectivePermissions(
   role: AdminRole,
   overrides: PermissionOverrides | null | undefined

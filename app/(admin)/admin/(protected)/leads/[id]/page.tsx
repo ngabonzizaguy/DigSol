@@ -9,6 +9,7 @@ import { LeadDetailControls } from "@/components/admin/leads/lead-detail-control
 import { LeadReplyComposer } from "@/components/admin/leads/lead-reply-composer";
 import { LeadAiAssist } from "@/components/admin/leads/lead-ai-assist";
 import { LeadThread } from "@/components/admin/leads/lead-thread";
+import { LeadPipelineBar } from "@/components/admin/leads/lead-pipeline-bar";
 import type { Lead } from "@/lib/supabase/types";
 
 export const dynamic = "force-dynamic";
@@ -52,8 +53,10 @@ export default async function LeadDetailPage({ params }: { params: Promise<{ id:
 
       <div className="grid gap-4 lg:grid-cols-3">
         <div className="space-y-4 lg:col-span-2">
+          <LeadPipelineBar current={lead.status} />
+
           <Card>
-            <CardHeader><CardTitle>Message</CardTitle></CardHeader>
+            <CardHeader><CardTitle>Original submission</CardTitle></CardHeader>
             <CardContent className="space-y-3">
               <div className="rounded-md border border-admin-border bg-admin-elevated p-3 text-[13px] text-admin-fg whitespace-pre-wrap">
                 {lead.message ?? lead.intent ?? "—"}
