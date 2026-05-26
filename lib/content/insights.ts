@@ -8,6 +8,7 @@ export type Insight = {
   readTime: string;
   category: "Strategy" | "Engineering" | "Design" | "AI" | "Operations";
   date: string;
+  cover_url?: string | null;
 };
 
 export const insights: Insight[] = [

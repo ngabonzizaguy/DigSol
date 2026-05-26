@@ -4,12 +4,24 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { X } from "lucide-react";
 import { adminNav } from "@/lib/admin/nav";
+import { filterNavForProfile, type AdminRole, type PermissionOverrides } from "@/lib/admin/permissions";
 import { cn } from "@/lib/utils";
 import { useSidebar } from "@/components/admin/shell/sidebar-context";
+import { useMemo } from "react";
 
-export function AdminSidebar() {
+export function AdminSidebar({
+  role,
+  permissionOverrides = null,
+}: {
+  role?: AdminRole;
+  permissionOverrides?: PermissionOverrides | null;
+}) {
   const pathname = usePathname();
   const { collapsed, mobileOpen, closeMobile } = useSidebar();
+  const groups = useMemo(
+    () => (role ? filterNavForProfile(role, permissionOverrides) : adminNav),
+    [role, permissionOverrides]
+  );
 
   return (
     <>
@@ -55,7 +67,7 @@ export function AdminSidebar() {
         </div>
 
         <nav className="flex-1 overflow-y-auto px-2 py-3 text-[13px]">
-          {adminNav.map((group) => (
+          {groups.map((group) => (
             <div key={group.label} className="mb-4">
               {!collapsed ? (
                 <div className="px-2 pb-1.5 text-[10px] font-semibold uppercase tracking-wider text-admin-fg-subtle">

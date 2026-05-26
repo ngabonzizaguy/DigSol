@@ -1,12 +1,15 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 
+import type { AdminRole, PermissionOverrides } from "@/lib/admin/permissions";
+
 export type AdminProfile = {
   id: string;
   email: string;
   name: string | null;
-  role: "admin" | "editor" | "viewer";
+  role: AdminRole;
   avatar_url: string | null;
+  permissions: PermissionOverrides | null;
 };
 
 export async function requireAdminProfile(): Promise<AdminProfile> {
@@ -18,11 +21,11 @@ export async function requireAdminProfile(): Promise<AdminProfile> {
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("id, email, name, role, avatar_url")
+    .select("id, email, name, role, avatar_url, permissions")
     .eq("id", user.id)
     .maybeSingle();
 
-  if (!profile || (profile.role !== "admin" && profile.role !== "editor")) {
+  if (!profile || !["admin", "editor", "viewer"].includes(profile.role)) {
     redirect("/admin/login?error=unauthorized");
   }
   return profile as AdminProfile;
@@ -36,7 +39,7 @@ export async function getAdminProfileOrNull(): Promise<AdminProfile | null> {
   if (!user) return null;
   const { data } = await supabase
     .from("profiles")
-    .select("id, email, name, role, avatar_url")
+    .select("id, email, name, role, avatar_url, permissions")
     .eq("id", user.id)
     .maybeSingle();
   return (data as AdminProfile | null) ?? null;

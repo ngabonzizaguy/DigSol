@@ -5,7 +5,15 @@ export type ContentStatus = "draft" | "published" | "archived";
 export type SegmentKind = "smb" | "midmarket" | "enterprise";
 export type OrbColor = "mint" | "peach" | "lavender" | "sky" | "rose";
 export type LeadKind = "contact" | "consultation" | "newsletter" | "guide";
-export type LeadStatus = "new" | "contacted" | "qualified" | "won" | "lost";
+export type LeadStatus =
+  | "new"
+  | "in_progress"
+  | "replied"
+  | "closed"
+  | "qualified"
+  | "contacted"
+  | "won"
+  | "lost";
 export type UserRole = "admin" | "editor" | "viewer";
 
 export type Service = {
@@ -144,8 +152,26 @@ export type Lead = {
   status: LeadStatus;
   notes: string | null;
   assigned_to: string | null;
+  replied_at: string | null;
+  closed_at: string | null;
+  first_response_at: string | null;
   created_at: string;
   updated_at: string;
+};
+
+export type LeadMessage = {
+  id: string;
+  lead_id: string;
+  direction: "outbound" | "inbound" | "note";
+  channel: "email" | "internal";
+  subject: string | null;
+  body: string;
+  to_email: string | null;
+  from_email: string | null;
+  provider: "mock" | "resend";
+  provider_id: string | null;
+  created_by: string | null;
+  created_at: string;
 };
 
 export type SiteSettings = {

@@ -1,11 +1,12 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState, useTransition } from "react";
 import { useFormStatus } from "react-dom";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { submitContact } from "@/lib/forms/actions";
+import { improveContactMessage } from "@/lib/ai/actions";
 import { Button } from "@/components/ui/button";
 import { Input, Textarea } from "@/components/ui/input";
 
@@ -14,9 +15,12 @@ function Submit() {
   return <Button type="submit" size="md" disabled={pending}>{pending ? "Sending…" : "Send message"}</Button>;
 }
 
-export function ContactForm() {
+export function ContactForm({ aiAssistEnabled = false }: { aiAssistEnabled?: boolean }) {
   const router = useRouter();
+  const [message, setMessage] = useState("");
   const [state, action] = useActionState(submitContact, null);
+  const [aiPending, startAi] = useTransition();
+
   useEffect(() => {
     if (state?.ok) {
       toast.success("Thanks — we'll be in touch within one business day.");
@@ -25,6 +29,22 @@ export function ContactForm() {
       toast.error(state.error);
     }
   }, [state, router]);
+
+  function improveMessage() {
+    if (!message.trim()) {
+      toast.error("Write a message first");
+      return;
+    }
+    startAi(async () => {
+      try {
+        const improved = await improveContactMessage(message);
+        setMessage(improved);
+        toast.success("Message polished — review before sending");
+      } catch (e) {
+        toast.error(e instanceof Error ? e.message : "Could not improve message");
+      }
+    });
+  }
 
   return (
     <form action={action} className="grid gap-4">
@@ -48,9 +68,20 @@ export function ContactForm() {
       </div>
       <label className="space-y-1.5">
         <span className="text-sm font-medium text-body-strong">How can we help?</span>
-        <Textarea name="message" rows={5} required />
+        <Textarea name="message" rows={5} required value={message} onChange={(e) => setMessage(e.target.value)} />
       </label>
-      <div className="flex justify-end pt-2">
+      <div className="flex flex-wrap items-center justify-end gap-2 pt-2">
+        {aiAssistEnabled ? (
+          <Button
+            type="button"
+            variant="outline"
+            size="md"
+            disabled={aiPending}
+            onClick={improveMessage}
+          >
+            {aiPending ? "Improving…" : "Improve message"}
+          </Button>
+        ) : null}
         <Submit />
       </div>
     </form>

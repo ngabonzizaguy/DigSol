@@ -18,7 +18,18 @@ export function MediaLibrary({ items }: { items: Item[] }) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [uploading, setUploading] = useState(false);
+  const [query, setQuery] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
+
+  const filtered = items.filter((m) => {
+    if (!query.trim()) return true;
+    const q = query.toLowerCase();
+    return m.path.toLowerCase().includes(q) || (m.alt ?? "").toLowerCase().includes(q);
+  });
+
+  function copyUrl(url: string) {
+    void navigator.clipboard.writeText(url).then(() => toast.success("URL copied"));
+  }
 
   async function handleUpload(files: FileList | null) {
     if (!files || files.length === 0) return;
@@ -102,6 +113,15 @@ export function MediaLibrary({ items }: { items: Item[] }) {
         </div>
       </header>
 
+      {items.length > 0 ? (
+        <Input
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Search by path or alt text…"
+          className="max-w-md"
+        />
+      ) : null}
+
       {items.length === 0 ? (
         <EmptyState
           title="No media yet"
@@ -114,7 +134,7 @@ export function MediaLibrary({ items }: { items: Item[] }) {
         />
       ) : (
         <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-          {items.map((m) => (
+          {filtered.map((m) => (
             <Card key={m.id} className="overflow-hidden">
               <div className="aspect-square w-full overflow-hidden bg-admin-elevated">
                 {m.mime.startsWith("image/") ? (
@@ -133,15 +153,25 @@ export function MediaLibrary({ items }: { items: Item[] }) {
                     if (e.target.value !== (m.alt ?? "")) handleAlt(m.id, e.target.value);
                   }}
                 />
-                <div className="flex items-center justify-between text-[10px] text-admin-fg-subtle">
+                <div className="flex items-center justify-between gap-1 text-[10px] text-admin-fg-subtle">
                   <span className="font-mono">{Math.round(m.bytes / 1024)}kb</span>
-                  <button
-                    onClick={() => handleDelete(m.id, m.path)}
-                    disabled={pending}
-                    className="rounded p-1 hover:bg-admin-hover hover:text-error"
-                  >
-                    <Trash2 className="size-3" />
-                  </button>
+                  <div className="flex gap-0.5">
+                    <button
+                      type="button"
+                      onClick={() => copyUrl(m.url)}
+                      className="rounded px-1 py-0.5 hover:bg-admin-hover hover:text-admin-fg"
+                    >
+                      Copy URL
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleDelete(m.id, m.path)}
+                      disabled={pending}
+                      className="rounded p-1 hover:bg-admin-hover hover:text-error"
+                    >
+                      <Trash2 className="size-3" />
+                    </button>
+                  </div>
                 </div>
               </div>
             </Card>

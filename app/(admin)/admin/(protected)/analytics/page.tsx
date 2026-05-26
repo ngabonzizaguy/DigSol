@@ -1,106 +1,136 @@
-import { createClient } from "@/lib/supabase/server";
+import Link from "next/link";
+import { getAnalyticsSummary, getLeadFunnelCounts, type AnalyticsRange } from "@/lib/admin/analytics";
+import { generateAnalyticsInsight } from "@/lib/ai/actions";
+import { PageviewsAreaChart } from "@/components/admin/charts/pageviews-area-chart";
+import { BreakdownBarChart } from "@/components/admin/charts/breakdown-bar-chart";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/admin/ui/card";
 
 export const metadata = { title: "Analytics" };
 export const dynamic = "force-dynamic";
 
-export default async function AnalyticsPage() {
-  const supabase = await createClient();
-  const now = new Date();
-  const since = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000).toISOString();
+const RANGES: { label: string; value: AnalyticsRange }[] = [
+  { label: "7 days", value: "7d" },
+  { label: "30 days", value: "30d" },
+  { label: "90 days", value: "90d" },
+];
 
-  const [{ count: pageviews30d }, { data: topPages }, { data: leadsByDay }] = await Promise.all([
-    supabase.from("page_views").select("id", { count: "exact", head: true }).gte("created_at", since),
-    supabase
-      .from("page_views")
-      .select("path")
-      .gte("created_at", since)
-      .limit(1000),
-    supabase
-      .from("leads")
-      .select("created_at, status")
-      .gte("created_at", since)
-      .limit(1000),
+export default async function AnalyticsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ range?: string }>;
+}) {
+  const { range: rangeParam } = await searchParams;
+  const range: AnalyticsRange =
+    rangeParam === "7d" || rangeParam === "90d" ? rangeParam : "30d";
+
+  const [summary, funnel] = await Promise.all([
+    getAnalyticsSummary(range),
+    getLeadFunnelCounts(range),
   ]);
 
-  const pageCounts = new Map<string, number>();
-  for (const p of (topPages ?? []) as { path: string }[]) {
-    pageCounts.set(p.path, (pageCounts.get(p.path) ?? 0) + 1);
-  }
-  const ranked = [...pageCounts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 10);
-
-  const funnel = {
-    new: 0, contacted: 0, qualified: 0, won: 0, lost: 0,
-  } as Record<string, number>;
-  for (const l of (leadsByDay ?? []) as { status: string }[]) {
-    funnel[l.status] = (funnel[l.status] ?? 0) + 1;
-  }
+  const insight = await generateAnalyticsInsight(summary, funnel);
+  const funnelRows = Object.entries(funnel).map(([status, count]) => ({ status, count }));
 
   return (
     <div className="space-y-4">
-      <header>
-        <h1 className="text-[20px] font-semibold tracking-tight text-admin-fg">Analytics</h1>
-        <p className="text-[13px] text-admin-fg-subtle">Last 30 days. Lightweight first-party metrics.</p>
+      <header className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h1 className="text-[20px] font-semibold tracking-tight text-admin-fg">Analytics</h1>
+          <p className="text-[13px] text-admin-fg-subtle">Traffic, attribution, and lead pipeline.</p>
+        </div>
+        <nav className="flex gap-1">
+          {RANGES.map((r) => (
+            <Link
+              key={r.value}
+              href={`/admin/analytics?range=${r.value}`}
+              className={`rounded-md px-2.5 py-1 text-[12px] ${range === r.value ? "bg-admin-hover text-admin-fg" : "text-admin-fg-muted hover:bg-admin-hover"}`}
+            >
+              {r.label}
+            </Link>
+          ))}
+        </nav>
       </header>
 
       <section className="grid grid-cols-2 gap-3 md:grid-cols-4">
-        <Stat label="Pageviews (30d)" value={pageviews30d ?? 0} />
-        <Stat label="New leads" value={funnel.new} />
-        <Stat label="Won" value={funnel.won} />
-        <Stat label="Lost" value={funnel.lost} />
+        <Stat label="Pageviews" value={summary.total_views} />
+        <Stat label="New leads" value={funnel.new ?? 0} />
+        <Stat label="In progress" value={funnel.in_progress ?? 0} />
+        <Stat label="Replied" value={funnel.replied ?? 0} />
       </section>
+
+      {insight ? (
+        <Card>
+          <CardHeader>
+            <CardTitle>Insights</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-[13px] leading-relaxed text-admin-fg-muted">{insight}</p>
+          </CardContent>
+        </Card>
+      ) : null}
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Traffic over time</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <PageviewsAreaChart data={summary.by_day} />
+        </CardContent>
+      </Card>
 
       <div className="grid gap-4 lg:grid-cols-2">
         <Card>
-          <CardHeader><CardTitle>Top pages</CardTitle></CardHeader>
-          <CardContent className="!p-0">
-            {ranked.length === 0 ? (
-              <div className="px-4 py-8 text-center text-[13px] text-admin-fg-subtle">
-                No data yet. Page-view logger will start populating once visitors hit the site.
-              </div>
-            ) : (
-              <ul className="divide-y divide-admin-border-soft">
-                {ranked.map(([path, count]) => {
-                  const max = ranked[0][1];
-                  return (
-                    <li key={path} className="flex items-center justify-between gap-3 px-4 py-2.5">
-                      <span className="truncate font-mono text-[12px] text-admin-fg">{path}</span>
-                      <div className="flex flex-1 items-center justify-end gap-3">
-                        <div className="h-1.5 w-32 overflow-hidden rounded-full bg-admin-border-soft">
-                          <div className="h-full bg-admin-accent" style={{ width: `${(count / max) * 100}%` }} />
-                        </div>
-                        <span className="w-12 text-right text-[11px] text-admin-fg-muted">{count}</span>
-                      </div>
-                    </li>
-                  );
-                })}
-              </ul>
-            )}
+          <CardHeader>
+            <CardTitle>Top pages</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <BreakdownBarChart data={summary.top_pages} labelKey="path" />
           </CardContent>
         </Card>
-
         <Card>
-          <CardHeader><CardTitle>Lead funnel</CardTitle></CardHeader>
+          <CardHeader>
+            <CardTitle>Referrers</CardTitle>
+          </CardHeader>
           <CardContent>
-            <ul className="space-y-2">
-              {["new", "contacted", "qualified", "won", "lost"].map((s) => (
-                <li key={s} className="flex items-center justify-between gap-3">
-                  <span className="text-[12px] capitalize text-admin-fg">{s}</span>
-                  <div className="flex flex-1 items-center justify-end gap-3">
-                    <div className="h-1.5 w-32 overflow-hidden rounded-full bg-admin-border-soft">
-                      <div
-                        className="h-full bg-admin-accent"
-                        style={{ width: `${((funnel[s] ?? 0) / Math.max(1, Math.max(...Object.values(funnel)))) * 100}%` }}
-                      />
-                    </div>
-                    <span className="w-12 text-right text-[11px] text-admin-fg-muted">{funnel[s] ?? 0}</span>
-                  </div>
-                </li>
-              ))}
-            </ul>
+            <BreakdownBarChart
+              data={summary.top_referrers.map((r) => ({
+                referrer: r.referrer.length > 40 ? `${r.referrer.slice(0, 40)}…` : r.referrer,
+                views: r.views,
+              }))}
+              labelKey="referrer"
+            />
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle>Devices</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <BreakdownBarChart data={summary.devices} labelKey="device_type" />
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle>Countries</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <BreakdownBarChart data={summary.countries} labelKey="country" />
           </CardContent>
         </Card>
       </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Lead funnel</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {funnelRows.length === 0 ? (
+            <p className="text-[13px] text-admin-fg-subtle">No leads in this period.</p>
+          ) : (
+            <BreakdownBarChart data={funnelRows} labelKey="status" valueKey="count" />
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }
