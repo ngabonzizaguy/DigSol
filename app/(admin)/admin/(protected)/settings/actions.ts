@@ -69,7 +69,8 @@ export async function saveSettings(_prev: SettingsResult | null, formData: FormD
   if (error) return { ok: false, error: error.message };
 
   await logActivity({ entity: "site_settings", entity_id: "1", action: "update" });
-  revalidatePath("/");
+  revalidatePath("/", "layout");
+  revalidatePath("/how-we-work/engagement-models");
   revalidatePath("/contact");
   revalidatePath("/about");
   return { ok: true };

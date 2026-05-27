@@ -5,9 +5,9 @@ export type PageSectionsPersistState = "defaults_only" | "saved";
 export function pricingSourceLabel(source: PricingContentSource): string {
   switch (source) {
     case "page_sections":
-      return "Homepage → Page sections → Pricing (full tier copy)";
+      return "Page sections → Pricing (copy only; set prices in Settings → Pricing)";
     case "settings":
-      return "Site settings → Pricing (name, price, cadence overrides)";
+      return "Site settings → Pricing (live prices on the public site)";
     default:
       return "Built-in site defaults (not saved to Supabase yet)";
   }

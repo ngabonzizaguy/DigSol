@@ -52,8 +52,6 @@ export function SettingsForm({ settings, effectivePricing }: Props) {
     toast.message("Pricing rows reset to current live defaults (save to persist)");
   }
 
-  const richPricingOnSite = effectivePricing.source === "page_sections";
-
   return (
     <form action={action} className="min-w-0 space-y-4">
       <LiveContentNotice title="Editing the live site baseline">
@@ -147,20 +145,14 @@ export function SettingsForm({ settings, effectivePricing }: Props) {
             <p className="break-words">
               Source: <span className="text-admin-fg">{pricingSourceLabel(effectivePricing.source)}</span>
             </p>
-            {richPricingOnSite ? (
-              <p className="mt-2 break-words">
-                Full tier copy (descriptions, features, CTAs) is controlled in{" "}
-                <Link href="/admin/page-sections" className="text-admin-fg underline underline-offset-2">
-                  Page sections → Homepage → Pricing
-                </Link>
-                . Use the rows below only for quick name / price / cadence overrides when rich tiers are not saved.
-              </p>
-            ) : (
-              <p className="mt-2 break-words">
-                These rows override the built-in Launch / Growth / Enterprise defaults on the homepage when Page sections
-                pricing is empty.
-              </p>
-            )}
+            <p className="mt-2 break-words">
+              Prices and cadence here are what visitors see on the homepage and engagement models page. Descriptions,
+              features, and CTAs can be edited in{" "}
+              <Link href="/admin/page-sections" className="text-admin-fg underline underline-offset-2">
+                Page sections → Homepage → Pricing
+              </Link>
+              .
+            </p>
           </LiveContentNotice>
 
           <Card>

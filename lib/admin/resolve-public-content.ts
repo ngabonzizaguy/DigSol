@@ -1,6 +1,6 @@
 import "server-only";
 import { pricingTiers, type PricingTier } from "@/components/marketing/pricing-card";
-import { getPricingTiers, getPricingTiersForMarketing } from "@/lib/marketing/pricing-tiers";
+import { getPricingTiersForMarketing } from "@/lib/marketing/pricing-tiers";
 import { getPageSectionsStore } from "@/lib/marketing/page-sections-server";
 import { getSectionContent, parsePageSectionsFromIntegrations } from "@/lib/marketing/page-sections-store";
 import { getSiteSettings } from "@/lib/marketing/site-settings-server";
@@ -16,7 +16,19 @@ export async function getEffectivePricingForAdmin(): Promise<{
   tiers: PricingTier[];
   source: PricingContentSource;
 }> {
-  const [settings, store] = await Promise.all([getSiteSettings(), getPageSectionsStore()]);
+  const settings = await getSiteSettings();
+  const tiers = await getPricingTiersForMarketing();
+
+  const dbHasTiers =
+    Array.isArray(settings.pricing_tiers) &&
+    settings.pricing_tiers.length > 0 &&
+    settings.pricing_tiers.some((t) => t.name?.trim() && t.price?.trim());
+
+  if (dbHasTiers) {
+    return { tiers, source: "settings" };
+  }
+
+  const store = await getPageSectionsStore();
   const homePricing = getSectionContent(store, "home", "pricing");
   const rawTiers = homePricing.tiers;
   const hasRich =
@@ -24,21 +36,8 @@ export async function getEffectivePricingForAdmin(): Promise<{
     rawTiers.length > 0 &&
     (rawTiers as { name?: string }[]).some((t) => t.name?.trim());
 
-  if (hasRich) {
-    const tiers = getPricingTiers(homePricing);
-    if (tiers.length > 0) {
-      return { tiers, source: "page_sections" };
-    }
-  }
-
-  const tiers = await getPricingTiersForMarketing();
-  const dbHasTiers =
-    Array.isArray(settings.pricing_tiers) &&
-    settings.pricing_tiers.length > 0 &&
-    settings.pricing_tiers.some((t) => t.name?.trim());
-
-  if (dbHasTiers) {
-    return { tiers, source: "settings" };
+  if (hasRich && tiers.length > 0) {
+    return { tiers, source: "page_sections" };
   }
 
   return { tiers, source: "static_defaults" };

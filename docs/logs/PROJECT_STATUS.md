@@ -77,6 +77,7 @@
 | **Public form RLS fix (2026-05-27)** | Quick Start / contact / consultation / newsletter inserts use server `getServiceSupabase()` — anon `.insert().select()` failed for guests (no SELECT policy on `leads`) |
 | **Mobile form layout (2026-05-27)** | `/start`, `/book-consultation`, contact forms: `min-w-0`, stacked buttons, header spacing under fixed nav |
 | **Activity log fix (2026-05-27)** | `logActivity` + `createServiceClient` use `getServiceSupabase()` (cookie SSR was blocking inserts); `activity_read_authenticated` applied on live DB |
+| **Pricing settings → public (2026-05-27)** | `getPricingTiersForMarketing` applies `site_settings.pricing_tiers` over page-section tier copy; settings save revalidates home + engagement models |
 
 ---
 
