@@ -30,26 +30,33 @@ export type CaseStudy = {
 
 export const caseStudies: CaseStudy[] = [
   {
-    slug: "smb-retail-cloud-migration",
-    client: "Northwind Outfitters",
-    title: "An indie retailer goes omni-channel in 6 weeks",
+    slug: "greenride-africa-mobility",
+    client: "Greenride Africa",
+    title: "Rwanda's electric ride platform — app, web, and ops shipped together",
     segment: "smb",
-    industry: "Retail & e-commerce",
+    industry: "Mobility & ride-hailing",
     summary:
-      "A 30-store outdoor retailer needed to unify in-store and online sales without a multi-year SAP project.",
+      "Greenride Africa, a fully electric mobility startup in Kigali, needed a passenger app, marketing website, and booking backbone before launching on city streets — without cloning legacy fuel-based taxi stacks.",
     challenge:
-      "Stock sat in spreadsheets, the website ran on a 2017 theme, and refunds took 12 days. Leadership wanted a single source of truth and 'launch this quarter, not next year'.",
+      "Riders expected reliable EV trips booked in seconds; operations still ran on spreadsheets and chat threads. The brand had to earn trust as a local, sustainable alternative — not a generic ride template. Leadership wanted mobile, web, and backend delivered by one accountable team ahead of a public launch.",
     approach:
-      "We rebuilt the storefront on Shopify Hydrogen, replaced the inventory layer with a lean middleware on Vercel + Supabase, and wired Stripe for omnichannel refunds and store credit.",
+      "We designed and built the passenger mobile experience and responsive web presence, unified ride requests and trip status on Supabase + Vercel, and added an operations-friendly admin layer for bookings and fleet visibility. Notifications, payments, and analytics were wired for day-one service across Kigali — ride-hailing, VIP, corporate, and airport runs on one platform.",
     outcome:
-      "Launched in 6 weeks. Inventory accuracy moved from ~78% to 99.4%. Online revenue doubled within a quarter and refund time dropped to 36 hours.",
+      "Greenride launched with a 100% electric fleet on Kigali streets — clean, quiet rides built for local riders. Bookings flow through the app; corporate and VIP programs share the same core. The stack is ready to extend into delivery and charging as the network grows across Rwanda.",
     metrics: [
-      { label: "Revenue growth", value: "+112%" },
-      { label: "Inventory accuracy", value: "99.4%" },
-      { label: "Refund time", value: "12d → 36h" },
+      { label: "Fleet", value: "100% electric" },
+      { label: "Services live", value: "Ride · VIP · Corp" },
+      { label: "Market", value: "Kigali, Rwanda" },
     ],
-    services: ["web-mobile", "commerce-payments", "analytics-growth"],
-    orb: "peach",
+    services: ["web-mobile", "digital-strategy", "automation-ai"],
+    orb: "mint",
+    featured: true,
+    project_url: "https://play.google.com/store/apps/details?id=com.greenrideafrica.passenger",
+    show_project_url: true,
+    customer_quote:
+      "No fuel. No noise. No pollution — just clean, electric rides made for our people, with software we can actually run the business on.",
+    customer_name: "Greenride Africa team",
+    customer_role: "Founding team",
   },
   {
     slug: "enterprise-bank-data-platform",

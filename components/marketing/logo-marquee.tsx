@@ -1,7 +1,7 @@
 "use client";
 
 const DEFAULT_PARTNERS = [
-  "Northwind",
+  "Greenride Africa",
   "Meridian Financial",
   "Cedar Health",
   "Forge & Field",

@@ -378,7 +378,7 @@ const HOME_FEATURES_DEFAULT: SectionContentValue = {
 };
 
 const TRUST_PARTNERS_DEFAULT = [
-  { name: "Northwind" },
+  { name: "Greenride Africa" },
   { name: "Meridian Financial" },
   { name: "Cedar Health" },
   { name: "Forge & Field" },

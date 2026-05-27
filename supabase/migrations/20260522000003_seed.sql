@@ -103,14 +103,14 @@ on conflict (slug) do nothing;
 -- Case studies
 -- ============================================================================
 insert into public.case_studies (slug, client, title, segment, industry, summary, challenge, approach, outcome, metrics, service_slugs, orb, status, featured, sort_order) values
-('smb-retail-cloud-migration','Northwind Outfitters','An indie retailer goes omni-channel in 6 weeks','smb','Retail & e-commerce',
- 'A 30-store outdoor retailer needed to unify in-store and online sales without a multi-year SAP project.',
- 'Stock sat in spreadsheets, the website ran on a 2017 theme, and refunds took 12 days. Leadership wanted a single source of truth and ''launch this quarter, not next year''.',
- 'We rebuilt the storefront on Shopify Hydrogen, replaced the inventory layer with a lean middleware on Vercel + Supabase, and wired Stripe for omnichannel refunds and store credit.',
- 'Launched in 6 weeks. Inventory accuracy moved from ~78% to 99.4%. Online revenue doubled within a quarter and refund time dropped to 36 hours.',
- '[{"label":"Revenue growth","value":"+112%"},{"label":"Inventory accuracy","value":"99.4%"},{"label":"Refund time","value":"12d → 36h"}]'::jsonb,
- array['web-mobile','commerce-payments','analytics-growth'],
- 'peach','published',true,10),
+('greenride-africa-mobility','Greenride Africa','Rwanda''s electric ride platform — app, web, and ops shipped together','smb','Mobility & ride-hailing',
+ 'Greenride Africa, a fully electric mobility startup in Kigali, needed a passenger app, marketing website, and booking backbone before launching on city streets — without cloning legacy fuel-based taxi stacks.',
+ 'Riders expected reliable EV trips booked in seconds; operations still ran on spreadsheets and chat threads. The brand had to earn trust as a local, sustainable alternative — not a generic ride template. Leadership wanted mobile, web, and backend delivered by one accountable team ahead of a public launch.',
+ 'We designed and built the passenger mobile experience and responsive web presence, unified ride requests and trip status on Supabase + Vercel, and added an operations-friendly admin layer for bookings and fleet visibility. Notifications, payments, and analytics were wired for day-one service across Kigali — ride-hailing, VIP, corporate, and airport runs on one platform.',
+ 'Greenride launched with a 100% electric fleet on Kigali streets — clean, quiet rides built for local riders. Bookings flow through the app; corporate and VIP programs share the same core. The stack is ready to extend into delivery and charging as the network grows across Rwanda.',
+ '[{"label":"Fleet","value":"100% electric"},{"label":"Services live","value":"Ride · VIP · Corp"},{"label":"Market","value":"Kigali, Rwanda"}]'::jsonb,
+ array['web-mobile','digital-strategy','automation-ai'],
+ 'mint','published',true,10),
 ('enterprise-bank-data-platform','Meridian Financial Group','A regional bank''s data backbone, modernised without a freeze','enterprise','Financial services',
  'A 2,000-employee bank needed a unified customer data layer feeding 14 downstream systems without a service interruption.',
  'Customer data lived in 6 source systems. Compliance reporting took 3 weeks. Marketing personalisation was effectively impossible.',
