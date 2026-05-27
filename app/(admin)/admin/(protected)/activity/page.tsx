@@ -38,6 +38,7 @@ const ACTION_LABELS: Record<string, string> = {
   "create:consultation": "New consultation request",
   "create:newsletter": "Newsletter signup",
   "create:guide": "Guide download",
+  "create:quick_start": "Quick Start submission",
 };
 
 function actionLabel(action: string) {

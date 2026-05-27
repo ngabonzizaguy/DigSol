@@ -76,6 +76,7 @@
 | Manual smoke | Re-test Quick Start with doc + voice upload; confirm admin Attachments panel shows files and Download works; prior test lead files are not recoverable (only links backfilled from payload) |
 | **Public form RLS fix (2026-05-27)** | Quick Start / contact / consultation / newsletter inserts use server `getServiceSupabase()` — anon `.insert().select()` failed for guests (no SELECT policy on `leads`) |
 | **Mobile form layout (2026-05-27)** | `/start`, `/book-consultation`, contact forms: `min-w-0`, stacked buttons, header spacing under fixed nav |
+| **Activity log fix (2026-05-27)** | `logActivity` + `createServiceClient` use `getServiceSupabase()` (cookie SSR was blocking inserts); `activity_read_authenticated` applied on live DB |
 
 ---
 

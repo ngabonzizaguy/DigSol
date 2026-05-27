@@ -1,4 +1,5 @@
-import { createClient, createServiceClient } from "@/lib/supabase/server";
+import { createClient } from "@/lib/supabase/server";
+import { getServiceSupabase } from "@/lib/supabase/service";
 
 export async function logActivity(params: {
   entity: string;
@@ -12,15 +13,17 @@ export async function logActivity(params: {
       data: { user },
     } = await sessionClient.auth.getUser();
 
-    const supabase = await createServiceClient();
-    await supabase.from("activity_log").insert({
+    const { error } = await getServiceSupabase().from("activity_log").insert({
       actor_id: user?.id ?? null,
       entity: params.entity,
       entity_id: params.entity_id ?? null,
       action: params.action,
       diff: params.diff ?? null,
     });
-  } catch {
-    // Activity logging must never break the main action.
+    if (error) {
+      console.error("[activity] insert failed:", error.message);
+    }
+  } catch (e) {
+    console.error("[activity] logActivity error:", e instanceof Error ? e.message : e);
   }
 }
