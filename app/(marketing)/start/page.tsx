@@ -34,9 +34,9 @@ export default async function QuickStartPage() {
 
       <Section>
         <Container>
-          <div className="grid grid-cols-1 gap-10 lg:grid-cols-[1.4fr_1fr]">
+          <div className="grid min-w-0 grid-cols-1 gap-10 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
             <PageSection pageId="start" sectionId="flow">
-              <FadeIn>
+              <FadeIn className="min-w-0">
                 <QuickStartPageClient />
               </FadeIn>
             </PageSection>

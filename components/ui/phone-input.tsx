@@ -2,12 +2,14 @@
 
 import * as React from "react";
 import { CountrySelect } from "@/components/ui/country-select";
-import { findCountry } from "@/lib/marketing/countries";
+import { findCountry, flagEmoji } from "@/lib/marketing/countries";
 import { cn } from "@/lib/utils";
 
 export interface PhoneInputProps {
   countryCode?: string | null;
   onCountryChange?: (code: string, dial: string) => void;
+  /** When false, dial code comes from `countryCode` only (use with a separate Country field). */
+  showCountrySelect?: boolean;
   value?: string;
   onChange?: (value: string) => void;
   name?: string; // submitted as `<name>` (digits-only national); we also submit dial via hidden inputs
@@ -33,6 +35,7 @@ export interface PhoneInputProps {
 export function PhoneInput({
   countryCode,
   onCountryChange,
+  showCountrySelect = true,
   value,
   onChange,
   name = "phone",
@@ -46,12 +49,29 @@ export function PhoneInput({
   const country = findCountry(countryCode ?? undefined);
 
   return (
-    <div className={cn("flex w-full", className)}>
-      <CountrySelect
-        variant="compact"
-        value={country?.code}
-        onChange={(entry) => onCountryChange?.(entry.code, entry.dial)}
-      />
+    <div className={cn("flex w-full min-w-0", className)}>
+      {showCountrySelect ? (
+        <CountrySelect
+          variant="compact"
+          className="shrink-0 max-w-[9.5rem] sm:max-w-[10.5rem]"
+          value={country?.code}
+          onChange={(entry) => onCountryChange?.(entry.code, entry.dial)}
+        />
+      ) : (
+        <span
+          aria-hidden
+          className="flex h-11 shrink-0 items-center gap-1.5 rounded-l-lg border border-r-0 border-hairline-strong bg-surface-card px-3 text-[15px] text-muted"
+        >
+          {country ? (
+            <>
+              <span className="text-base leading-none">{flagEmoji(country.code)}</span>
+              <span className="tabular-nums">{country.dial}</span>
+            </>
+          ) : (
+            <span className="text-muted-soft">—</span>
+          )}
+        </span>
+      )}
       <input
         id={id}
         type="tel"
@@ -62,7 +82,7 @@ export function PhoneInput({
         placeholder={placeholder}
         name={name}
         required={required}
-        className="h-11 flex-1 rounded-r-lg border border-hairline-strong bg-surface-card px-4 text-[15px] text-ink placeholder:text-muted-soft focus:outline-none focus:border-ink transition-colors"
+        className="h-11 min-w-0 flex-1 rounded-r-lg border border-hairline-strong bg-surface-card px-4 text-[15px] text-ink placeholder:text-muted-soft focus:outline-none focus:border-ink transition-colors"
       />
       <input type="hidden" name={countryFieldName} value={country?.code ?? ""} readOnly />
       <input type="hidden" name={dialFieldName} value={country?.dial ?? ""} readOnly />

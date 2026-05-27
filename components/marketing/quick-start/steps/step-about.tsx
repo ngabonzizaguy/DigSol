@@ -9,10 +9,10 @@ export function StepAbout() {
   const { draft, setDraft, config } = useQuickStart();
 
   return (
-    <div className="space-y-4">
+    <div className="min-w-0 space-y-4">
       <p className="text-[15px] text-body">{config.copy.about.body}</p>
-      <div className="grid gap-4 md:grid-cols-2">
-        <label className="space-y-1.5">
+      <div className="grid min-w-0 grid-cols-1 gap-4 md:grid-cols-2">
+        <label className="min-w-0 space-y-1.5">
           <span className="text-sm font-medium text-body-strong">Your name</span>
           <Input
             value={draft.about.name}
@@ -23,7 +23,7 @@ export function StepAbout() {
             required
           />
         </label>
-        <label className="space-y-1.5">
+        <label className="min-w-0 space-y-1.5">
           <span className="text-sm font-medium text-body-strong">Email</span>
           <Input
             type="email"
@@ -35,7 +35,7 @@ export function StepAbout() {
             required
           />
         </label>
-        <label className="space-y-1.5">
+        <label className="min-w-0 space-y-1.5 md:col-span-2">
           <span className="text-sm font-medium text-body-strong">Country</span>
           <CountrySelect
             value={draft.about.country_code}
@@ -47,21 +47,16 @@ export function StepAbout() {
             }
           />
         </label>
-        <label className="space-y-1.5">
+        <label className="min-w-0 space-y-1.5 md:col-span-2">
           <span className="text-sm font-medium text-body-strong">Phone (optional)</span>
           <PhoneInput
+            showCountrySelect={false}
             countryCode={draft.about.country_code}
             value={draft.about.phone}
             onChange={(v) => setDraft((d) => ({ ...d, about: { ...d.about, phone: v } }))}
-            onCountryChange={(code, dial) =>
-              setDraft((d) => ({
-                ...d,
-                about: { ...d.about, country_code: code, phone_dial_code: dial },
-              }))
-            }
           />
         </label>
-        <label className="space-y-1.5">
+        <label className="min-w-0 space-y-1.5">
           <span className="text-sm font-medium text-body-strong">Company (optional)</span>
           <Input
             value={draft.about.company}
@@ -71,7 +66,7 @@ export function StepAbout() {
             placeholder="Where you work"
           />
         </label>
-        <label className="space-y-1.5">
+        <label className="min-w-0 space-y-1.5">
           <span className="text-sm font-medium text-body-strong">Role (optional)</span>
           <Input
             value={draft.about.role}

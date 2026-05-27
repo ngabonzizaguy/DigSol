@@ -48,8 +48,8 @@ export function CountrySelect({
           aria-label="Select country"
           className={cn(
             variant === "field"
-              ? "flex h-11 w-full items-center justify-between rounded-lg border border-hairline-strong bg-surface-card px-4 text-[15px] text-ink hover:border-ink/40 focus:outline-none focus:border-ink transition-colors"
-              : "flex h-11 items-center gap-1.5 rounded-l-lg border border-r-0 border-hairline-strong bg-surface-card px-3 text-[15px] text-ink hover:bg-surface-strong focus:outline-none transition-colors",
+              ? "flex h-11 w-full min-w-0 items-center justify-between rounded-lg border border-hairline-strong bg-surface-card px-4 text-[15px] text-ink hover:border-ink/40 focus:outline-none focus:border-ink transition-colors"
+              : "flex h-11 min-w-0 shrink-0 items-center gap-1.5 rounded-l-lg border border-r-0 border-hairline-strong bg-surface-card px-3 text-[15px] text-ink hover:bg-surface-strong focus:outline-none transition-colors",
             className,
           )}
         >

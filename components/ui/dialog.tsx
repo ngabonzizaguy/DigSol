@@ -40,8 +40,8 @@ const DialogContent = React.forwardRef<
   const positioning =
     variant === "sheet"
       ? // Bottom sheet on mobile, centered on md+
-        "left-0 right-0 bottom-0 mx-auto max-h-[92vh] max-w-3xl rounded-b-none " +
-        "md:bottom-auto md:top-1/2 md:left-1/2 md:right-auto md:-translate-x-1/2 md:-translate-y-1/2 md:rounded-3xl md:max-h-[88vh]"
+        "left-0 right-0 bottom-0 mx-auto max-h-[92vh] w-full max-w-3xl rounded-t-3xl rounded-b-none " +
+        "md:bottom-auto md:top-1/2 md:left-1/2 md:right-auto md:w-full md:-translate-x-1/2 md:-translate-y-1/2 md:rounded-3xl md:max-h-[88vh]"
       : "left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 max-w-2xl max-h-[88vh]";
 
   return (

@@ -191,7 +191,12 @@ export function QuickStartFlow({ variant = "modal" }: QuickStartFlowProps) {
   const stepIsSuccess = draft.step === TOTAL_STEPS;
 
   return (
-    <div className={cn("flex flex-col gap-6", variant === "page" && "max-w-3xl mx-auto")}>
+    <div
+      className={cn(
+        "flex min-w-0 w-full flex-col gap-6",
+        variant === "page" && "mx-auto max-w-3xl",
+      )}
+    >
       {/* Progress chrome */}
       {!stepIsSuccess && (
         <div aria-label="Progress" className="space-y-2">

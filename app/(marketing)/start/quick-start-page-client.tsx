@@ -73,7 +73,7 @@ export function QuickStartPageClient() {
         />
       </div>
 
-      <div className="glass rounded-3xl p-6 md:p-10">
+      <div className="glass min-w-0 w-full overflow-hidden rounded-3xl p-5 sm:p-6 md:p-10">
         <QuickStartFlow variant="page" />
       </div>
     </div>

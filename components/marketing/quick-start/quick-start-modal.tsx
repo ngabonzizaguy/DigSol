@@ -69,7 +69,7 @@ export function QuickStartModal() {
               </Link>
             </div>
           </div>
-          <div className="flex-1 overflow-y-auto px-6 py-6 md:px-8 md:py-7">
+          <div className="min-w-0 flex-1 overflow-x-hidden overflow-y-auto px-5 py-6 sm:px-6 md:px-8 md:py-7">
             <QuickStartFlow variant="modal" />
           </div>
         </div>
