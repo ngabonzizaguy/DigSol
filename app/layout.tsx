@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, EB_Garamond, JetBrains_Mono } from "next/font/google";
 import { Toaster } from "sonner";
+import { Analytics } from "@vercel/analytics/next";
 import { getSiteSettings } from "@/lib/marketing/site-settings-server";
 import { site } from "@/lib/site";
 import "./globals.css";
@@ -61,6 +62,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="min-h-screen bg-canvas text-body antialiased" suppressHydrationWarning>
         {children}
         <Toaster position="bottom-right" richColors closeButton />
+        <Analytics />
       </body>
     </html>
   );
