@@ -8,6 +8,8 @@ import { PageSection } from "@/components/marketing/page-section";
 import { loadMarketingPageStore, pageHeroContent } from "@/lib/marketing/marketing-page-content";
 import { getSectionContent } from "@/lib/marketing/page-sections-store";
 import { getSiteSettings } from "@/lib/marketing/site-settings-server";
+import { getQuickStartConfig } from "@/lib/marketing/quick-start-server";
+import { getAiSettings } from "@/lib/ai/settings";
 import { site } from "@/lib/site";
 import { Mail, Phone, MapPin } from "lucide-react";
 
@@ -17,11 +19,17 @@ export const metadata: Metadata = {
 };
 
 export default async function ContactPage() {
-  const [store, settings] = await Promise.all([loadMarketingPageStore(), getSiteSettings()]);
+  const [store, settings, ai, qs] = await Promise.all([
+    loadMarketingPageStore(),
+    getSiteSettings(),
+    getAiSettings(),
+    getQuickStartConfig(),
+  ]);
   const hero = pageHeroContent(store, "contact");
   const email = settings.contact.email?.trim() || site.email;
   const phone = settings.contact.phone?.trim() || site.phone;
   const formSection = getSectionContent<{ ai_assist_enabled?: boolean }>(store, "contact", "form");
+  const aiAssistEnabled = ai.contact_assist_enabled || formSection.ai_assist_enabled === true;
   const sidebar = getSectionContent<{
     contact_title?: string;
     locations?: string;
@@ -42,7 +50,11 @@ export default async function ContactPage() {
             <PageSection pageId="contact" sectionId="form">
               <FadeIn>
                 <div className="rounded-2xl border border-hairline bg-surface-card p-8 shadow-soft lg:p-10">
-                  <ContactForm aiAssistEnabled={formSection.ai_assist_enabled === true} />
+                  <ContactForm
+                    aiAssistEnabled={aiAssistEnabled}
+                    whatsappNumber={qs.whatsapp.number_e164 || undefined}
+                    defaultCountry={qs.whatsapp.default_country}
+                  />
                   <p className="mt-5 text-[12px] text-muted">
                     By submitting this form you agree to our privacy policy. We never share your details.
                   </p>

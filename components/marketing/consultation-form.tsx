@@ -1,22 +1,35 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect, useState } from "react";
 import { useFormStatus } from "react-dom";
-import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { MessageCircle } from "lucide-react";
 import { toast } from "sonner";
 import { submitConsultation } from "@/lib/forms/actions";
 import { Button } from "@/components/ui/button";
 import { Input, Textarea } from "@/components/ui/input";
+import { PhoneInput } from "@/components/ui/phone-input";
+import { findCountry } from "@/lib/marketing/countries";
+import { buildWhatsAppLink } from "@/lib/marketing/whatsapp";
 
 function Submit() {
   const { pending } = useFormStatus();
   return <Button type="submit" size="md" disabled={pending}>{pending ? "Submitting…" : "Request session"}</Button>;
 }
 
-export function ConsultationForm() {
+export interface ConsultationFormProps {
+  whatsappNumber?: string;
+  defaultCountry?: string;
+}
+
+export function ConsultationForm({ whatsappNumber, defaultCountry = "RW" }: ConsultationFormProps) {
   const router = useRouter();
   const [state, action] = useActionState(submitConsultation, null);
+  const [name, setName] = useState("");
+  const [intent, setIntent] = useState("");
+  const [countryCode, setCountryCode] = useState(defaultCountry);
+  const [phone, setPhone] = useState("");
+
   useEffect(() => {
     if (state?.ok) {
       toast.success("Thanks — we'll confirm your slot within one business day.");
@@ -26,12 +39,20 @@ export function ConsultationForm() {
     }
   }, [state, router]);
 
+  const country = findCountry(countryCode);
+  const waLink = whatsappNumber
+    ? buildWhatsAppLink(
+        whatsappNumber,
+        `Hi DigSolutions — ${name ? `I'm ${name}.` : ""} I'd like to book a consultation. ${intent}`.trim(),
+      )
+    : null;
+
   return (
     <form action={action} className="grid gap-4">
       <div className="grid gap-4 md:grid-cols-2">
         <label className="space-y-1.5">
           <span className="text-sm font-medium text-body-strong">Name</span>
-          <Input name="name" required />
+          <Input name="name" required value={name} onChange={(e) => setName(e.target.value)} />
         </label>
         <label className="space-y-1.5">
           <span className="text-sm font-medium text-body-strong">Email</span>
@@ -43,7 +64,12 @@ export function ConsultationForm() {
         </label>
         <label className="space-y-1.5">
           <span className="text-sm font-medium text-body-strong">Phone (optional)</span>
-          <Input name="phone" type="tel" />
+          <PhoneInput
+            countryCode={country?.code}
+            value={phone}
+            onChange={setPhone}
+            onCountryChange={(code) => setCountryCode(code)}
+          />
         </label>
         <label className="space-y-1.5">
           <span className="text-sm font-medium text-body-strong">Company size</span>
@@ -68,9 +94,19 @@ export function ConsultationForm() {
       </div>
       <label className="space-y-1.5">
         <span className="text-sm font-medium text-body-strong">What outcomes are you optimising for?</span>
-        <Textarea name="intent" rows={5} required />
+        <Textarea name="intent" rows={5} required value={intent} onChange={(e) => setIntent(e.target.value)} />
       </label>
-      <div className="flex justify-end pt-2">
+      <div className="flex flex-wrap justify-end gap-2 pt-2">
+        {waLink ? (
+          <a
+            href={waLink}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 rounded-full border border-hairline-strong bg-surface-card px-5 py-2 text-[15px] text-ink hover:bg-surface-strong transition-colors"
+          >
+            <MessageCircle className="h-4 w-4" /> Send via WhatsApp
+          </a>
+        ) : null}
         <Submit />
       </div>
     </form>

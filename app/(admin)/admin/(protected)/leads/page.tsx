@@ -21,6 +21,7 @@ const TABS: { label: string; status: string | "all" }[] = [
 
 const KINDS: { label: string; value: LeadKind | "all" }[] = [
   { label: "All types", value: "all" },
+  { label: "Quick Start", value: "quick_start" },
   { label: "Contact", value: "contact" },
   { label: "Consultation", value: "consultation" },
   { label: "Newsletter", value: "newsletter" },

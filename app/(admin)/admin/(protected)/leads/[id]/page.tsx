@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ArrowLeft, Mail, Phone } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { isEmailMockMode } from "@/lib/email";
+import { getAttachmentSignedUrl } from "@/lib/admin/attachments";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/admin/ui/card";
 import { StatusBadge, Badge } from "@/components/admin/ui/badge";
 import { LeadDetailControls } from "@/components/admin/leads/lead-detail-controls";
@@ -10,7 +11,9 @@ import { LeadReplyComposer } from "@/components/admin/leads/lead-reply-composer"
 import { LeadAiAssist } from "@/components/admin/leads/lead-ai-assist";
 import { LeadThread } from "@/components/admin/leads/lead-thread";
 import { LeadPipelineBar } from "@/components/admin/leads/lead-pipeline-bar";
-import type { Lead } from "@/lib/supabase/types";
+import { LeadAttachmentsPanel } from "@/components/admin/leads/lead-attachments-panel";
+import { findCountry, flagEmoji } from "@/lib/marketing/countries";
+import type { Lead, LeadAttachment } from "@/lib/supabase/types";
 
 export const dynamic = "force-dynamic";
 
@@ -34,6 +37,38 @@ export default async function LeadDetailPage({ params }: { params: Promise<{ id:
     .eq("entity_id", lead.id)
     .order("created_at", { ascending: false })
     .limit(20);
+
+  const { data: attachmentsRaw } = await supabase
+    .from("lead_attachments")
+    .select("*")
+    .eq("lead_id", lead.id)
+    .order("created_at", { ascending: true });
+  const attachments = (attachmentsRaw ?? []) as LeadAttachment[];
+  const attachmentsWithUrls = await Promise.all(
+    attachments.map(async (a) => ({
+      ...a,
+      signedUrl: a.storage_path
+        ? await getAttachmentSignedUrl(a.storage_path, {
+            downloadName: a.original_name ?? undefined,
+          })
+        : a.url,
+    })),
+  );
+
+  const isQuickStart = lead.kind === "quick_start";
+  const country = findCountry(lead.country_code);
+  const phoneDisplay = lead.phone
+    ? `${lead.phone_dial_code ?? ""} ${lead.phone}`.trim()
+    : (lead.payload as Record<string, unknown> | null)?.phone
+      ? String((lead.payload as Record<string, unknown>).phone)
+      : null;
+  const budgetDisplay = lead.budget_unsure
+    ? "Not sure yet"
+    : lead.budget_min != null && lead.budget_max != null
+      ? lead.budget_currency === "USD"
+        ? `$${lead.budget_min.toLocaleString()} – $${lead.budget_max.toLocaleString()}`
+        : `${lead.budget_min.toLocaleString()} – ${lead.budget_max.toLocaleString()} RWF`
+      : null;
 
   const mockMode = isEmailMockMode();
 
@@ -67,7 +102,17 @@ export default async function LeadDetailPage({ params }: { params: Promise<{ id:
                 <Field label="Role">{lead.role ?? "—"}</Field>
                 <Field label="Company size">{lead.company_size ?? "—"}</Field>
                 <Field label="Timeline">{lead.timeline ?? "—"}</Field>
-                <Field label="Phone">{(lead.payload as Record<string, unknown> | null)?.phone ? <a className="inline-flex items-center gap-1" href={`tel:${(lead.payload as Record<string, unknown>).phone}`}><Phone className="size-3" />{String((lead.payload as Record<string, unknown>).phone)}</a> : "—"}</Field>
+                <Field label="Phone">{phoneDisplay ? <a className="inline-flex items-center gap-1" href={`tel:${phoneDisplay.replace(/\s+/g, "")}`}><Phone className="size-3" />{phoneDisplay}</a> : "—"}</Field>
+                {country ? <Field label="Country">{flagEmoji(country.code)} {country.name}</Field> : null}
+                {isQuickStart ? (
+                  <>
+                    <Field label="Budget">{budgetDisplay ?? "—"}</Field>
+                    <Field label="Preferred channel">{lead.preferred_channel ?? "—"}</Field>
+                    <Field label="Window">{lead.preferred_window ?? "—"}</Field>
+                    <Field label="Services">{lead.service_slugs.length > 0 ? lead.service_slugs.join(", ") : "—"}</Field>
+                    <Field label="Custom request">{lead.custom_request ? <span className="line-clamp-3 whitespace-pre-wrap">{lead.custom_request}</span> : "—"}</Field>
+                  </>
+                ) : null}
               </div>
               {Object.keys(lead.payload ?? {}).length > 0 ? (
                 <details className="text-[12px]">
@@ -77,6 +122,8 @@ export default async function LeadDetailPage({ params }: { params: Promise<{ id:
               ) : null}
             </CardContent>
           </Card>
+
+          <LeadAttachmentsPanel attachments={attachmentsWithUrls} showForQuickStart={isQuickStart} />
 
           <LeadThread messages={messages ?? []} />
 

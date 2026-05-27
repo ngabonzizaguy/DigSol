@@ -6,6 +6,7 @@ import { FadeIn } from "@/components/marketing/fade-in";
 import { PageSection } from "@/components/marketing/page-section";
 import { loadMarketingPageStore, pageHeroContent } from "@/lib/marketing/marketing-page-content";
 import { getSectionContent } from "@/lib/marketing/page-sections-store";
+import { getQuickStartConfig } from "@/lib/marketing/quick-start-server";
 import { Check, Clock, Calendar } from "lucide-react";
 
 export const metadata: Metadata = {
@@ -16,7 +17,7 @@ export const metadata: Metadata = {
 const EXPECTATION_ICONS = [Clock, Calendar, Check, Check];
 
 export default async function BookConsultationPage() {
-  const store = await loadMarketingPageStore();
+  const [store, qs] = await Promise.all([loadMarketingPageStore(), getQuickStartConfig()]);
   const hero = pageHeroContent(store, "book_consultation");
   const expectations = getSectionContent<{ title?: string; body?: string }>(store, "book_consultation", "expectations");
   const title = expectations.title?.trim() || "What to expect.";
@@ -39,7 +40,10 @@ export default async function BookConsultationPage() {
             <PageSection pageId="book_consultation" sectionId="form">
               <FadeIn>
                 <div className="rounded-2xl border border-hairline bg-surface-card p-8 shadow-soft lg:p-10">
-                  <ConsultationForm />
+                  <ConsultationForm
+                    whatsappNumber={qs.whatsapp.number_e164 || undefined}
+                    defaultCountry={qs.whatsapp.default_country}
+                  />
                   <p className="mt-5 text-[12px] text-muted">We respond within one business day.</p>
                 </div>
               </FadeIn>

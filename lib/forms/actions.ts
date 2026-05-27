@@ -10,6 +10,9 @@ const contactSchema = z.object({
   company: z.string().max(160).optional().or(z.literal("")),
   role: z.string().max(160).optional().or(z.literal("")),
   message: z.string().min(1).max(4000),
+  phone: z.string().optional().or(z.literal("")),
+  phone_country: z.string().length(2).optional().or(z.literal("")),
+  phone_dial: z.string().optional().or(z.literal("")),
 });
 
 const consultationSchema = z.object({
@@ -20,6 +23,8 @@ const consultationSchema = z.object({
   timeline: z.string().optional().or(z.literal("")),
   intent: z.string().min(1),
   phone: z.string().optional().or(z.literal("")),
+  phone_country: z.string().length(2).optional().or(z.literal("")),
+  phone_dial: z.string().optional().or(z.literal("")),
 });
 
 const newsletterSchema = z.object({
@@ -35,11 +40,15 @@ export async function submitContact(_prev: FormResult | null, formData: FormData
     company: String(formData.get("company") ?? ""),
     role: String(formData.get("role") ?? ""),
     message: String(formData.get("message") ?? ""),
+    phone: String(formData.get("phone") ?? ""),
+    phone_country: String(formData.get("phone_country") ?? ""),
+    phone_dial: String(formData.get("phone_dial") ?? ""),
   };
   const parsed = contactSchema.safeParse(raw);
   if (!parsed.success) return { ok: false, error: "Please fix the highlighted fields." };
 
   const supabase = await createClient();
+  const phoneClean = parsed.data.phone ? parsed.data.phone.replace(/[^\d]/g, "") : null;
   const { data, error } = await supabase
     .from("leads")
     .insert({
@@ -49,6 +58,9 @@ export async function submitContact(_prev: FormResult | null, formData: FormData
       company: parsed.data.company || null,
       role: parsed.data.role || null,
       message: parsed.data.message,
+      phone: phoneClean,
+      country_code: parsed.data.phone_country || null,
+      phone_dial_code: parsed.data.phone_dial || null,
       payload: { source: "/contact" },
     })
     .select("id")
@@ -68,11 +80,14 @@ export async function submitConsultation(_prev: FormResult | null, formData: For
     timeline: String(formData.get("timeline") ?? ""),
     intent: String(formData.get("intent") ?? ""),
     phone: String(formData.get("phone") ?? ""),
+    phone_country: String(formData.get("phone_country") ?? ""),
+    phone_dial: String(formData.get("phone_dial") ?? ""),
   };
   const parsed = consultationSchema.safeParse(raw);
   if (!parsed.success) return { ok: false, error: "Please fix the highlighted fields." };
 
   const supabase = await createClient();
+  const phoneClean = parsed.data.phone ? parsed.data.phone.replace(/[^\d]/g, "") : null;
   const { data, error } = await supabase
     .from("leads")
     .insert({
@@ -83,6 +98,9 @@ export async function submitConsultation(_prev: FormResult | null, formData: For
       company_size: parsed.data.company_size || null,
       timeline: parsed.data.timeline || null,
       intent: parsed.data.intent,
+      phone: phoneClean,
+      country_code: parsed.data.phone_country || null,
+      phone_dial_code: parsed.data.phone_dial || null,
       payload: { phone: parsed.data.phone, source: "/book-consultation" },
     })
     .select("id")
