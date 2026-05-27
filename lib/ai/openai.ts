@@ -1,11 +1,27 @@
 import type { AiCompletionOptions, AiProvider } from "./types";
 
-export function createOpenAiProvider(apiKey: string, model: string): AiProvider {
+const DEFAULT_CHAT_URL = "https://api.openai.com/v1/chat/completions";
+
+export function resolveChatCompletionsUrl(baseUrl?: string | null): string {
+  const raw = baseUrl?.trim();
+  if (!raw) return DEFAULT_CHAT_URL;
+  const normalized = raw.replace(/\/$/, "");
+  if (normalized.endsWith("/chat/completions")) return normalized;
+  return `${normalized}/chat/completions`;
+}
+
+export function createOpenAiProvider(
+  apiKey: string,
+  model: string,
+  baseUrl?: string | null,
+  providerName = "openai"
+): AiProvider {
+  const endpoint = resolveChatCompletionsUrl(baseUrl);
   return {
-    name: "openai",
+    name: providerName,
     isMock: false,
     async complete(options) {
-      const res = await fetch("https://api.openai.com/v1/chat/completions", {
+      const res = await fetch(endpoint, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${apiKey}`,

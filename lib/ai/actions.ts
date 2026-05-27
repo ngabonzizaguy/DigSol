@@ -1,7 +1,14 @@
 "use server";
 
-import { getAiProvider } from "@/lib/ai";
+import { getAiProviderFromSettings } from "@/lib/ai/settings";
+import { getAiSettings } from "@/lib/ai/settings";
 import type { AnalyticsSummary } from "@/lib/admin/analytics";
+
+const TONE_HINTS: Record<string, string> = {
+  professional: "Use a polished, professional tone.",
+  friendly: "Use a warm, friendly tone.",
+  concise: "Use a brief, no-frills tone with short sentences.",
+};
 
 export async function summarizeLead(input: {
   name: string | null;
@@ -10,7 +17,11 @@ export async function summarizeLead(input: {
   kind: string;
   status: string;
 }): Promise<string> {
-  const ai = getAiProvider();
+  const settings = await getAiSettings();
+  if (!settings.lead_assist_enabled) {
+    throw new Error("Lead AI assist is disabled. Enable it in Admin → AI.");
+  }
+  const ai = await getAiProviderFromSettings();
   return ai.complete({
     messages: [
       {
@@ -28,12 +39,17 @@ export async function summarizeLead(input: {
 export async function suggestReplyTone(input: {
   message: string | null;
 }): Promise<string> {
-  const ai = getAiProvider();
+  const settings = await getAiSettings();
+  if (!settings.lead_assist_enabled) {
+    throw new Error("Lead AI assist is disabled. Enable it in Admin → AI.");
+  }
+  const ai = await getAiProviderFromSettings();
+  const toneHint = TONE_HINTS[settings.default_reply_tone] ?? TONE_HINTS.professional;
   return ai.complete({
     messages: [
       {
         role: "system",
-        content: "Suggest reply tone and structure for a digital transformation consultancy.",
+        content: `Suggest reply tone and structure for a digital transformation consultancy. ${toneHint}`,
       },
       {
         role: "user",
@@ -44,9 +60,13 @@ export async function suggestReplyTone(input: {
 }
 
 export async function improveContactMessage(message: string): Promise<string> {
+  const settings = await getAiSettings();
+  if (!settings.contact_assist_enabled) {
+    throw new Error("Contact AI polish is disabled.");
+  }
   const text = message.trim();
   if (!text) throw new Error("Message is empty");
-  const ai = getAiProvider();
+  const ai = await getAiProviderFromSettings();
   return ai.complete({
     messages: [
       {
@@ -61,8 +81,10 @@ export async function improveContactMessage(message: string): Promise<string> {
 export async function generateAnalyticsInsight(
   summary: AnalyticsSummary,
   funnel: Record<string, number>
-): Promise<string> {
-  const ai = getAiProvider();
+): Promise<string | null> {
+  const settings = await getAiSettings();
+  if (!settings.analytics_insight_enabled) return null;
+  const ai = await getAiProviderFromSettings();
   return ai.complete({
     messages: [
       {

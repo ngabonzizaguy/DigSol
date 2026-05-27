@@ -12,7 +12,7 @@ export function AdminTopbar({
   user,
   integrationMode,
 }: {
-  user: { email: string; role: string; name?: string | null } | null;
+  user: { email: string; role: string; name?: string | null; avatar_url?: string | null } | null;
   integrationMode?: { aiMock?: boolean; emailMock?: boolean };
 }) {
   const pathname = usePathname();
@@ -94,17 +94,30 @@ export function AdminTopbar({
         </Link>
 
         {user ? (
-          <div className="flex items-center gap-2 rounded-full border border-admin-border bg-admin-surface px-2 py-1">
-            <span className="grid size-5 place-items-center rounded-full bg-admin-accent text-[10px] font-bold text-admin-accent-fg">
-              {user.email.charAt(0).toUpperCase()}
-            </span>
+          <Link
+            href="/admin/account"
+            className="flex items-center gap-2 rounded-full border border-admin-border bg-admin-surface px-2 py-1 hover:bg-admin-hover"
+            aria-label="Account"
+          >
+            {user.avatar_url ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={user.avatar_url}
+                alt=""
+                className="size-5 rounded-full object-cover"
+              />
+            ) : (
+              <span className="grid size-5 place-items-center rounded-full bg-admin-accent text-[10px] font-bold text-admin-accent-fg">
+                {(user.name ?? user.email).charAt(0).toUpperCase()}
+              </span>
+            )}
             <span className="hidden text-[12px] font-medium text-admin-fg sm:inline">
               {user.name ?? user.email.split("@")[0]}
             </span>
             <span className="hidden rounded bg-admin-border-soft px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-wider text-admin-fg-subtle sm:inline">
               {user.role}
             </span>
-          </div>
+          </Link>
         ) : null}
       </div>
     </header>

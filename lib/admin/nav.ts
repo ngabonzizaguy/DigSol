@@ -14,6 +14,8 @@ import {
   Activity,
   BarChart3,
   PanelsTopLeft,
+  Sparkles,
+  User,
 } from "lucide-react";
 
 export type AdminNavItem = {
@@ -42,7 +44,7 @@ export const adminNav: AdminNavGroup[] = [
     items: [
       { href: "/admin/services", label: "Services", icon: Briefcase },
       { href: "/admin/industries", label: "Industries", icon: Building2 },
-      { href: "/admin/work", label: "Case studies", icon: Folder },
+      { href: "/admin/work", label: "Work", icon: Folder },
       { href: "/admin/insights", label: "Insights", icon: FileText },
       { href: "/admin/guides", label: "Guides", icon: BookOpen },
       { href: "/admin/testimonials", label: "Testimonials", icon: MessageSquareQuote },
@@ -54,6 +56,7 @@ export const adminNav: AdminNavGroup[] = [
     label: "Operations",
     items: [
       { href: "/admin/leads", label: "Leads", icon: Inbox },
+      { href: "/admin/quick-start", label: "Quick Start", icon: Sparkles },
       { href: "/admin/media", label: "Media", icon: ImageIcon },
     ],
   },
@@ -62,7 +65,9 @@ export const adminNav: AdminNavGroup[] = [
     items: [
       { href: "/admin/page-sections", label: "Page sections", icon: PanelsTopLeft },
       { href: "/admin/users", label: "Users & roles", icon: UserCog },
+      { href: "/admin/ai", label: "AI", icon: Sparkles },
       { href: "/admin/settings", label: "Settings", icon: Settings },
+      { href: "/admin/account", label: "My account", icon: User },
     ],
   },
 ];

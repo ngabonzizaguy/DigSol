@@ -6,26 +6,23 @@ import {
   getLeadFunnelCounts,
   getLeadFunnelPeriodSplit,
   getWeeklyDeviceMix,
-  type AnalyticsRange,
+  resolveAnalyticsWindow,
 } from "@/lib/admin/analytics";
 import { generateAnalyticsInsight } from "@/lib/ai/actions";
 import { PageviewsAreaChart } from "@/components/admin/charts/pageviews-area-chart";
 import { BreakdownList } from "@/components/admin/charts/breakdown-list";
 import { AnalyticsRadarChart } from "@/components/admin/charts/analytics-radar-chart";
 import { AnalyticsMultiRadarChart } from "@/components/admin/charts/analytics-multi-radar-chart";
+import { AnalyticsRangePicker } from "@/components/admin/analytics/analytics-range-picker";
+import { ResetAnalyticsCard } from "@/components/admin/analytics/reset-analytics-card";
 import { AdminEmpty } from "@/components/admin/ui/admin-empty";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/admin/ui/card";
 import { buttonVariants } from "@/components/admin/ui/button";
+import { requireAdminProfile } from "@/lib/admin/auth";
 import { cn } from "@/lib/utils";
 
 export const metadata = { title: "Analytics" };
 export const dynamic = "force-dynamic";
-
-const RANGES: { label: string; value: AnalyticsRange }[] = [
-  { label: "7 days", value: "7d" },
-  { label: "30 days", value: "30d" },
-  { label: "90 days", value: "90d" },
-];
 
 const DEVICE_SERIES = [
   { key: "desktop", label: "Desktop" },
@@ -41,18 +38,27 @@ const PERIOD_SERIES = [
 export default async function AnalyticsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ range?: string }>;
+  searchParams: Promise<{ range?: string; from?: string; to?: string }>;
 }) {
-  const { range: rangeParam } = await searchParams;
-  const range: AnalyticsRange =
-    rangeParam === "7d" || rangeParam === "90d" ? rangeParam : "30d";
+  const profile = await requireAdminProfile();
+  const params = await searchParams;
+  const window = resolveAnalyticsWindow({
+    range: params.range ?? null,
+    from: params.from ?? null,
+    to: params.to ?? null,
+  });
+
+  const isCustom = window.key.includes("_");
+  const activePreset = (isCustom ? "custom" : window.key) as "7d" | "30d" | "90d" | "custom";
+  const fromISO = window.from.toISOString().slice(0, 10);
+  const toISO = window.to.toISOString().slice(0, 10);
 
   const [summary, funnel, weeklyDeviceMix, countrySplit, funnelSplit] = await Promise.all([
-    getAnalyticsSummary(range),
-    getLeadFunnelCounts(range),
-    getWeeklyDeviceMix(range),
-    getCountryPeriodSplit(range),
-    getLeadFunnelPeriodSplit(range),
+    getAnalyticsSummary(window),
+    getLeadFunnelCounts(window),
+    getWeeklyDeviceMix(window),
+    getCountryPeriodSplit(window),
+    getLeadFunnelPeriodSplit(window),
   ]);
 
   const insight = summary.total_views > 0 ? await generateAnalyticsInsight(summary, funnel) : null;
@@ -98,24 +104,10 @@ export default async function AnalyticsPage({
         <div>
           <h1 className="text-[20px] font-semibold tracking-tight text-admin-fg">Analytics</h1>
           <p className="text-[13px] text-admin-fg-subtle">
-            First-party traffic and lead pipeline for the selected period.
+            {fromISO} → {toISO}
           </p>
         </div>
-        <nav className="flex flex-wrap gap-1 rounded-lg border border-admin-border-soft bg-admin-surface p-1">
-          {RANGES.map((r) => (
-            <Link
-              key={r.value}
-              href={`/admin/analytics?range=${r.value}`}
-              className={`rounded-md px-3 py-1.5 text-[12px] font-medium transition-colors ${
-                range === r.value
-                  ? "bg-admin-accent text-admin-accent-fg"
-                  : "text-admin-fg-muted hover:bg-admin-hover hover:text-admin-fg"
-              }`}
-            >
-              {r.label}
-            </Link>
-          ))}
-        </nav>
+        <AnalyticsRangePicker activePreset={activePreset} from={fromISO} to={toISO} />
       </header>
 
       <section className="grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -247,6 +239,8 @@ export default async function AnalyticsPage({
           )}
         </CardContent>
       </Card>
+
+      {profile.role === "admin" ? <ResetAnalyticsCard /> : null}
     </div>
   );
 }

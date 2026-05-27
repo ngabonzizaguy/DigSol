@@ -1,9 +1,27 @@
 import { mockAiProvider } from "./mock";
 import { createOpenAiProvider } from "./openai";
+import {
+  getAiProviderFromSettings,
+  getAiRuntimeStatus,
+} from "./settings";
 import type { AiProvider } from "./types";
 
 export type { AiMessage, AiCompletionOptions, AiProvider } from "./types";
+export type {
+  AiSettings,
+  AiSettingsFormState,
+  AiRuntimeStatus,
+  AiProviderPreset,
+  AiReplyTone,
+} from "./config-types";
+export {
+  getAiSettings,
+  getAiSettingsForAdmin,
+  getAiProviderFromSettings,
+  getAiRuntimeStatus,
+} from "./settings";
 
+/** @deprecated Prefer `getAiProviderFromSettings()` — reads DB + env. */
 export function getAiProvider(): AiProvider {
   const key = process.env.AI_API_KEY?.trim();
   const provider = (process.env.AI_PROVIDER ?? "mock").toLowerCase();
@@ -14,6 +32,6 @@ export function getAiProvider(): AiProvider {
   return mockAiProvider;
 }
 
-export function isAiMockMode(): boolean {
-  return getAiProvider().isMock;
+export async function isAiMockMode(): Promise<boolean> {
+  return (await getAiProviderFromSettings()).isMock;
 }

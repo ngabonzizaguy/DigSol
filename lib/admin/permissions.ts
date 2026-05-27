@@ -11,7 +11,9 @@ export type AdminResource =
   | "media"
   | "page_sections"
   | "users"
-  | "settings";
+  | "settings"
+  | "ai"
+  | "account";
 
 export type AdminAction = "read" | "create" | "update" | "delete" | "reply" | "publish" | "manage";
 
@@ -28,6 +30,8 @@ export const ROLE_PRESETS: Record<AdminRole, Partial<Record<AdminResource, Admin
     page_sections: ALL_ACTIONS,
     users: ALL_ACTIONS,
     settings: ALL_ACTIONS,
+    ai: ALL_ACTIONS,
+    account: ALL_ACTIONS,
   },
   editor: {
     dashboard: ["read"],
@@ -39,6 +43,8 @@ export const ROLE_PRESETS: Record<AdminRole, Partial<Record<AdminResource, Admin
     page_sections: ["read", "update"],
     users: [],
     settings: [],
+    ai: ["read"],
+    account: ["read", "update"],
   },
   viewer: {
     dashboard: ["read"],
@@ -50,6 +56,8 @@ export const ROLE_PRESETS: Record<AdminRole, Partial<Record<AdminResource, Admin
     page_sections: ["read"],
     users: [],
     settings: [],
+    ai: ["read"],
+    account: ["read", "update"],
   },
 };
 
@@ -66,6 +74,8 @@ export const PERMISSION_RESOURCES: { key: AdminResource; label: string; actions:
   { key: "page_sections", label: "Page sections", actions: ["read", "update"] },
   { key: "users", label: "Users & roles", actions: ["read", "manage"] },
   { key: "settings", label: "Site settings", actions: ["read", "update"] },
+  { key: "ai", label: "AI features", actions: ["read", "update"] },
+  { key: "account", label: "Account (own profile)", actions: ["read", "update"] },
 ];
 
 export function getEffectivePermissions(
@@ -92,6 +102,8 @@ export function canAccessRoute(
   if (pathname.startsWith("/admin/media")) return has("media");
   if (pathname.startsWith("/admin/users")) return has("users");
   if (pathname.startsWith("/admin/settings")) return has("settings");
+  if (pathname.startsWith("/admin/ai")) return has("ai");
+  if (pathname.startsWith("/admin/account")) return has("account");
   if (pathname.startsWith("/admin/page-sections")) return has("page_sections");
   if (
     pathname.startsWith("/admin/services") ||

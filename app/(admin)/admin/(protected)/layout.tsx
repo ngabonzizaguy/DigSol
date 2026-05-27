@@ -7,10 +7,11 @@ export const dynamic = "force-dynamic";
 
 export default async function ProtectedAdminLayout({ children }: { children: React.ReactNode }) {
   const profile = await requireAdminProfile();
+  const aiMock = await isAiMockMode();
   return (
     <AdminShell
       user={profile}
-      integrationMode={{ aiMock: isAiMockMode(), emailMock: isEmailMockMode() }}
+      integrationMode={{ aiMock, emailMock: isEmailMockMode() }}
     >
       {children}
     </AdminShell>
