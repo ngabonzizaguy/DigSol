@@ -19,6 +19,7 @@ export type HomeHeroPreviewContent = {
 
 export type HomeTrustContent = {
   label?: string;
+  partners?: { name?: string }[];
   stats?: { value?: string; label?: string }[];
 };
 

@@ -14,6 +14,7 @@ export function AdminShell({
     email: string;
     role: AdminRole;
     name?: string | null;
+    avatar_url?: string | null;
     permissions?: PermissionOverrides | null;
   } | null;
   integrationMode?: { aiMock?: boolean; emailMock?: boolean };

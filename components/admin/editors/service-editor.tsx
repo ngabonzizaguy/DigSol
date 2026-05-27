@@ -4,15 +4,14 @@ import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
 import { useEffect, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { toast } from "sonner";
-import { ArrowLeft, Trash2 } from "lucide-react";
+import { Trash2 } from "lucide-react";
+import { EditorFormHeader } from "@/components/admin/editors/editor-form-header";
 import { upsertService, deleteService, publishService, unpublishService } from "@/app/(admin)/admin/(protected)/services/actions";
 import { Button } from "@/components/admin/ui/button";
 import { Input, Textarea } from "@/components/admin/ui/input";
 import { FormField } from "@/components/admin/ui/form-field";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/admin/ui/card";
-import { StatusBadge } from "@/components/admin/ui/badge";
 import { StickySaveBar } from "@/components/admin/ui/sticky-save-bar";
 import { slugify } from "@/lib/admin/slugify";
 import type { Service, OrbColor, ContentStatus } from "@/lib/supabase/types";
@@ -99,32 +98,27 @@ export function ServiceEditor(props: EditorProps) {
     <form action={action} className="space-y-4 pb-24">
       {init?.id ? <input type="hidden" name="id" value={init.id} /> : null}
 
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <Link href="/admin/services" className="flex items-center gap-1 text-[12px] text-admin-fg-subtle hover:text-admin-fg">
-            <ArrowLeft className="size-3" />
-            Services
-          </Link>
-          <span className="text-admin-fg-subtle">/</span>
-          <h1 className="text-[16px] font-semibold tracking-tight text-admin-fg">
-            {isEdit ? init?.title : "New service"}
-          </h1>
-          {isEdit && init ? <StatusBadge status={init.status} /> : null}
-        </div>
-        <div className="flex items-center gap-2">
-          {isEdit && init ? (
-            <>
-              <Button type="button" variant="ghost" size="sm" onClick={handleTogglePublish} disabled={pending}>
-                {init.status === "published" ? "Unpublish" : "Publish"}
-              </Button>
-              <Button type="button" variant="danger" size="icon" onClick={handleDelete} disabled={pending}>
-                <Trash2 className="size-3.5" />
-              </Button>
-            </>
-          ) : null}
-          <SaveButton />
-        </div>
-      </div>
+      <EditorFormHeader
+        backHref="/admin/services"
+        backLabel="Services"
+        title={isEdit ? title || init?.title || "Service" : "New service"}
+        status={init?.status}
+        actions={
+          <>
+            {isEdit && init ? (
+              <>
+                <Button type="button" variant="ghost" size="sm" onClick={handleTogglePublish} disabled={pending}>
+                  {init.status === "published" ? "Unpublish" : "Publish"}
+                </Button>
+                <Button type="button" variant="danger" size="icon" onClick={handleDelete} disabled={pending}>
+                  <Trash2 className="size-3.5" />
+                </Button>
+              </>
+            ) : null}
+            <SaveButton />
+          </>
+        }
+      />
 
       <div className="grid gap-4 lg:grid-cols-3">
         <div className="space-y-4 lg:col-span-2">

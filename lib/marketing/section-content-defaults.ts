@@ -377,6 +377,21 @@ const HOME_FEATURES_DEFAULT: SectionContentValue = {
   ],
 };
 
+const TRUST_PARTNERS_DEFAULT = [
+  { name: "Northwind" },
+  { name: "Meridian Financial" },
+  { name: "Cedar Health" },
+  { name: "Forge & Field" },
+  { name: "Loop Analytics" },
+  { name: "Atlas Foods" },
+  { name: "Lumen & Co." },
+  { name: "Halcyon Bank" },
+  { name: "Tessera Labs" },
+  { name: "Brightline" },
+  { name: "Orbital Logistics" },
+  { name: "Kinship Health" },
+];
+
 const HOME_DEFAULTS: PageSectionContentMap["home"] = {
   hero: {
     announcement: "Now booking Q3 transformation engagements",
@@ -407,6 +422,7 @@ const HOME_DEFAULTS: PageSectionContentMap["home"] = {
   },
   trust: {
     label: "Trusted by teams shipping real digital work",
+    partners: TRUST_PARTNERS_DEFAULT.map((p) => ({ ...p })),
     stats: stats.map((s) => ({ value: s.value, label: s.label })),
   },
   services: {

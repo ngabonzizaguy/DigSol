@@ -48,9 +48,9 @@ export function StatusBadge({ status }: { status: string }) {
                       ? "danger"
                       : "neutral";
   return (
-    <Badge tone={tone as "success" | "warning" | "danger" | "info" | "neutral"}>
+    <Badge tone={tone as "success" | "warning" | "danger" | "info" | "neutral"} className="capitalize">
       <span className="size-1.5 rounded-full bg-current opacity-70" />
-      {status}
+      {status.replace(/_/g, " ")}
     </Badge>
   );
 }

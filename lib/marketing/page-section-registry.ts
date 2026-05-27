@@ -342,6 +342,17 @@ export const MARKETING_PAGE_REGISTRY: MarketingPageDef[] = [
     sections: [...hero(), s("form", "Consultation form", "Booking intake form."), s("expectations", "What to expect", "Sidebar expectations copy.")],
   },
   {
+    id: "start",
+    label: "Quick Start",
+    path: "/start",
+    group: "Conversion",
+    sections: [
+      ...hero(),
+      s("flow", "Quick Start flow", "Multi-step intent capture (modal + page variant)."),
+      s("sidebar", "Sidebar reassurance", "What happens next, expected response time."),
+    ],
+  },
+  {
     id: "faq",
     label: "FAQ",
     path: "/faq",

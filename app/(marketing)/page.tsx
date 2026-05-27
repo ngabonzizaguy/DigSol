@@ -40,8 +40,12 @@ export default async function HomePage() {
   const tiers = await getPricingTiersForMarketing();
   const cta = getSectionContent<CtaBandContent>(store, "home", "cta_band");
 
-  const featuredCases = caseStudies.slice(0, 3);
+  const featuredFlagged = caseStudies.filter((c) => c.featured);
+  const featuredCases = (featuredFlagged.length > 0 ? featuredFlagged : caseStudies).slice(0, 3);
   const stats = (trust.stats ?? []).filter((s) => s.value?.trim() && s.label?.trim());
+  const partnerNames = (trust.partners ?? [])
+    .map((p) => p.name?.trim())
+    .filter((name): name is string => Boolean(name));
 
   return (
     <>
@@ -63,7 +67,7 @@ export default async function HomePage() {
                 </p>
               </FadeIn>
             ) : null}
-            <LogoMarquee />
+            <LogoMarquee partners={partnerNames.length > 0 ? partnerNames : undefined} />
             {stats.length > 0 ? (
               <div className="mt-12 grid grid-cols-2 gap-8 border-t border-hairline pt-12 lg:grid-cols-4 lg:gap-12">
                 {stats.map((s, i) => (

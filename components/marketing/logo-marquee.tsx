@@ -1,6 +1,6 @@
 "use client";
 
-const logos = [
+const DEFAULT_PARTNERS = [
   "Northwind",
   "Meridian Financial",
   "Cedar Health",
@@ -15,14 +15,17 @@ const logos = [
   "Kinship Health",
 ];
 
-export function LogoMarquee() {
-  const doubled = [...logos, ...logos];
+export function LogoMarquee({ partners }: { partners?: string[] }) {
+  const names =
+    partners?.map((p) => p.trim()).filter(Boolean).length ? partners!.map((p) => p.trim()).filter(Boolean) : DEFAULT_PARTNERS;
+  const doubled = [...names, ...names];
+
   return (
     <div className="relative mask-fade-edges overflow-hidden">
       <div className="flex w-max animate-marquee gap-12 py-2">
         {doubled.map((name, i) => (
           <div
-            key={i}
+            key={`${name}-${i}`}
             className="font-display text-[22px] font-light text-muted whitespace-nowrap select-none"
           >
             {name}

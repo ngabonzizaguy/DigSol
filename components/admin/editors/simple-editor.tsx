@@ -3,15 +3,15 @@
 import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
 import { useEffect, useState, useTransition } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { ArrowLeft, Trash2 } from "lucide-react";
+import { Trash2 } from "lucide-react";
+import { EditorFormHeader } from "@/components/admin/editors/editor-form-header";
 import { Button } from "@/components/admin/ui/button";
 import { Input, Textarea } from "@/components/admin/ui/input";
 import { FormField } from "@/components/admin/ui/form-field";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/admin/ui/card";
-import { StatusBadge } from "@/components/admin/ui/badge";
+import type { ContentStatus } from "@/lib/supabase/types";
 import { slugify } from "@/lib/admin/slugify";
 import { CoverImageField } from "@/components/admin/media/cover-image-field";
 import type { GenericActionResult } from "@/lib/admin/generic-actions";
@@ -83,6 +83,7 @@ export function SimpleEditor({
   }, [state, router]);
 
   const errors = state && !state.ok ? state.fieldErrors ?? {} : {};
+  const displayTitle = values.title?.trim() || values.name?.trim() || title;
 
   function setValue(name: string, value: string, opts?: { syncSlugFrom?: string }) {
     setValues((v) => {
@@ -99,62 +100,60 @@ export function SimpleEditor({
     <form action={formAction} className="space-y-4 pb-24">
       {initial?.id ? <input type="hidden" name="id" value={String(initial.id)} /> : null}
 
-      <header className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <Link href={backHref} className="flex items-center gap-1 text-[12px] text-admin-fg-subtle hover:text-admin-fg">
-            <ArrowLeft className="size-3" /> {entity}
-          </Link>
-          <span className="text-admin-fg-subtle">/</span>
-          <h1 className="text-[16px] font-semibold tracking-tight text-admin-fg">{title}</h1>
-          {status ? <StatusBadge status={status} /> : null}
-        </div>
-        <div className="flex items-center gap-2">
-          {initial?.id && publishAction && unpublishAction ? (
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              disabled={pending}
-              onClick={() =>
-                startTransition(async () => {
-                  try {
-                    if (status === "published") await unpublishAction();
-                    else await publishAction();
-                    toast.success(status === "published" ? "Unpublished" : "Published");
-                    router.refresh();
-                  } catch (e) {
-                    toast.error(e instanceof Error ? e.message : "Failed");
-                  }
-                })
-              }
-            >
-              {status === "published" ? "Unpublish" : "Publish"}
-            </Button>
-          ) : null}
-          {initial?.id && deleteAction ? (
-            <Button
-              type="button"
-              variant="danger"
-              size="icon"
-              disabled={pending}
-              onClick={() => {
-                if (!confirm("Delete? This cannot be undone.")) return;
-                startTransition(async () => {
-                  try {
-                    await deleteAction();
-                    toast.success("Deleted");
-                  } catch (e) {
-                    toast.error(e instanceof Error ? e.message : "Failed");
-                  }
-                });
-              }}
-            >
-              <Trash2 className="size-3.5" />
-            </Button>
-          ) : null}
-          <SaveBtn />
-        </div>
-      </header>
+      <EditorFormHeader
+        backHref={backHref}
+        backLabel={entity}
+        title={displayTitle}
+        status={status as ContentStatus | undefined}
+        actions={
+          <>
+            {initial?.id && publishAction && unpublishAction ? (
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                disabled={pending}
+                onClick={() =>
+                  startTransition(async () => {
+                    try {
+                      if (status === "published") await unpublishAction();
+                      else await publishAction();
+                      toast.success(status === "published" ? "Unpublished" : "Published");
+                      router.refresh();
+                    } catch (e) {
+                      toast.error(e instanceof Error ? e.message : "Failed");
+                    }
+                  })
+                }
+              >
+                {status === "published" ? "Unpublish" : "Publish"}
+              </Button>
+            ) : null}
+            {initial?.id && deleteAction ? (
+              <Button
+                type="button"
+                variant="danger"
+                size="icon"
+                disabled={pending}
+                onClick={() => {
+                  if (!confirm("Delete? This cannot be undone.")) return;
+                  startTransition(async () => {
+                    try {
+                      await deleteAction();
+                      toast.success("Deleted");
+                    } catch (e) {
+                      toast.error(e instanceof Error ? e.message : "Failed");
+                    }
+                  });
+                }}
+              >
+                <Trash2 className="size-3.5" />
+              </Button>
+            ) : null}
+            <SaveBtn />
+          </>
+        }
+      />
 
       <Card>
         <CardHeader>

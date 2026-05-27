@@ -134,15 +134,23 @@ export const CONTENT_SCHEMAS: Record<ContentSchemaId, ContentSchema> = {
     id: "home_trust",
     label: "Trust bar",
     fields: [{ key: "label", label: "Label above logos", type: "text", optional: true }],
-    list: {
-      key: "stats",
-      label: "Stat counters",
-      itemFields: [
-        { key: "value", label: "Value", type: "text" },
-        { key: "label", label: "Label", type: "text" },
-      ],
-      minItems: 0,
-    },
+    lists: [
+      {
+        key: "partners",
+        label: "Partner / client names (marquee)",
+        itemFields: [{ key: "name", label: "Name", type: "text" }],
+        minItems: 0,
+      },
+      {
+        key: "stats",
+        label: "Stat counters",
+        itemFields: [
+          { key: "value", label: "Value", type: "text" },
+          { key: "label", label: "Label", type: "text" },
+        ],
+        minItems: 0,
+      },
+    ],
   },
   stat_grid: {
     id: "stat_grid",
