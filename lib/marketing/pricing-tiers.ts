@@ -37,7 +37,13 @@ function parseRichTier(row: RichTierRow): PricingTier | null {
   const ctaLabel = row.cta_label?.trim();
   if (!ctaHref || !ctaLabel || features.length === 0) return null;
 
-  const featured = row.featured === "true" || row.featured === "1" || row.featured === "yes";
+  const badge = row.badge?.trim() || undefined;
+  const featuredExplicit =
+    row.featured === "true" || row.featured === "1" || row.featured === "yes";
+  const featured =
+    featuredExplicit ||
+    (badge ? /popular|featured/i.test(badge) : false) ||
+    pricingTiers.find((t) => t.name === name)?.featured === true;
 
   return {
     name,
@@ -48,7 +54,7 @@ function parseRichTier(row: RichTierRow): PricingTier | null {
     ctaLabel,
     ctaHref,
     featured: featured || undefined,
-    badge: row.badge?.trim() || undefined,
+    badge,
   };
 }
 
@@ -93,7 +99,7 @@ export function applySiteSettingsPricingOverrides(
       ...tier,
       price: db.price.trim(),
       cadence: db.cadence?.trim() || tier.cadence,
-      featured: db.featured ?? tier.featured,
+      featured: Boolean(db.featured || tier.featured),
     };
   });
 

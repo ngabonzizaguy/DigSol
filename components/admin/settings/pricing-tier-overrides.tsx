@@ -93,9 +93,9 @@ export function PricingTierOverrides({ tiers, onChange, onReset }: Props) {
                   />
                 </FormField>
                 <label className="flex h-10 items-center gap-2 rounded-md border border-transparent px-1 text-[12px] text-admin-fg-muted lg:h-auto">
+                  <input type="hidden" name="tier_featured" value={t.featured ? "true" : "false"} />
                   <input
                     type="checkbox"
-                    name="tier_featured"
                     checked={Boolean(t.featured)}
                     onChange={(e) => updateTier(i, "featured", e.target.checked)}
                     className="size-4 shrink-0 rounded border-admin-border"
