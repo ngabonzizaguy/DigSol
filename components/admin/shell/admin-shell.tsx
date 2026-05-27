@@ -7,7 +7,6 @@ import type { AdminRole, PermissionOverrides } from "@/lib/admin/permissions";
 
 export function AdminShell({
   user,
-  integrationMode,
   children,
 }: {
   user: {
@@ -17,7 +16,6 @@ export function AdminShell({
     avatar_url?: string | null;
     permissions?: PermissionOverrides | null;
   } | null;
-  integrationMode?: { aiMock?: boolean; emailMock?: boolean };
   children: React.ReactNode;
 }) {
   return (
@@ -27,7 +25,7 @@ export function AdminShell({
           <div className="flex min-h-screen w-full">
             <AdminSidebar role={user?.role} permissionOverrides={user?.permissions ?? null} />
             <div className="flex min-w-0 flex-1 flex-col">
-              <AdminTopbar user={user} integrationMode={integrationMode} />
+              <AdminTopbar user={user} />
               <main className="flex-1 overflow-x-hidden px-3 py-4 md:px-6 md:py-6">{children}</main>
             </div>
           </div>

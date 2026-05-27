@@ -31,13 +31,8 @@ export function LeadReplyComposer({ lead, mockMode }: { lead: Lead; mockMode: bo
 
   return (
     <Card>
-      <CardHeader className="flex flex-row items-center justify-between gap-2">
+      <CardHeader>
         <CardTitle>Reply</CardTitle>
-        {mockMode ? (
-          <span className="rounded-full border border-amber-500/40 bg-amber-500/10 px-2 py-0.5 text-[10px] font-medium text-amber-700 dark:text-amber-300">
-            Mock email
-          </span>
-        ) : null}
       </CardHeader>
       <CardContent className="space-y-3">
         <FormField label="Subject">

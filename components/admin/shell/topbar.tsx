@@ -10,10 +10,8 @@ import { useSidebar } from "@/components/admin/shell/sidebar-context";
 
 export function AdminTopbar({
   user,
-  integrationMode,
 }: {
   user: { email: string; role: string; name?: string | null; avatar_url?: string | null } | null;
-  integrationMode?: { aiMock?: boolean; emailMock?: boolean };
 }) {
   const pathname = usePathname();
   const { theme, toggle } = useTheme();
@@ -61,16 +59,6 @@ export function AdminTopbar({
       </nav>
 
       <div className="ml-auto flex items-center gap-1.5 md:gap-2">
-        {integrationMode?.aiMock ? (
-          <span className="hidden rounded-full border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-[10px] text-amber-700 dark:text-amber-300 sm:inline">
-            AI mock
-          </span>
-        ) : null}
-        {integrationMode?.emailMock ? (
-          <span className="hidden rounded-full border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-[10px] text-amber-700 dark:text-amber-300 sm:inline">
-            Email mock
-          </span>
-        ) : null}
         <button
           onClick={open}
           className="hidden h-7 items-center gap-2 rounded-md border border-admin-border bg-admin-surface px-2 text-[12px] text-admin-fg-subtle hover:bg-admin-hover md:flex"
