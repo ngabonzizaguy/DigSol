@@ -1,12 +1,14 @@
 import type { MetadataRoute } from "next";
-import { services } from "@/lib/content/services";
-import { industries } from "@/lib/content/industries";
-import { caseStudies } from "@/lib/content/work";
-import { insights } from "@/lib/content/insights";
-import { openRoles } from "@/lib/content/team";
+import {
+  getServices,
+  getIndustries,
+  getCaseStudies,
+  getInsights,
+  getOpenRoles,
+} from "@/lib/content/fetchers";
 import { site } from "@/lib/site";
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const base = site.url;
   const lastModified = new Date();
 
@@ -36,6 +38,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/legal/terms",
     "/legal/cookies",
   ];
+
+  const [services, industries, caseStudies, insights, openRoles] = await Promise.all([
+    getServices(),
+    getIndustries(),
+    getCaseStudies(),
+    getInsights(),
+    getOpenRoles(),
+  ]);
 
   return [
     ...staticRoutes.map((route) => ({ url: `${base}${route}`, lastModified })),

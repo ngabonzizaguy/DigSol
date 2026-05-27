@@ -10,6 +10,7 @@ out
 .cache
 *.tsbuildinfo
 .cursor/settings.json
+supabase/.temp/
 
 # Local AI agent workspace (never commit — stays on machine only)
 agents/
