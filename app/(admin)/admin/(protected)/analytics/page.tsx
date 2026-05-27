@@ -63,10 +63,12 @@ export default async function AnalyticsPage({
     label: p.path,
     value: p.views,
   }));
-  const topReferrers = summary.top_referrers.map((r) => ({
-    label: formatReferrerLabel(r.referrer),
-    value: r.views,
-  }));
+  const topReferrers = mergeBreakdownItems(
+    summary.top_referrers.map((r) => ({
+      label: formatReferrerLabel(r.referrer),
+      value: r.views,
+    }))
+  );
   const deviceRadar = toRadarData(
     summary.devices.map((d) => ({ label: formatDeviceLabel(d.device_type), value: d.views }))
   );
@@ -282,6 +284,17 @@ function Stat({ label, value }: { label: string; value: number }) {
       </div>
     </div>
   );
+}
+
+/** Combine rows that share the same display label (e.g. multiple localhost referrers → "Local dev"). */
+function mergeBreakdownItems(items: { label: string; value: number }[]) {
+  const totals = new Map<string, number>();
+  for (const item of items) {
+    totals.set(item.label, (totals.get(item.label) ?? 0) + item.value);
+  }
+  return [...totals.entries()]
+    .map(([label, value]) => ({ label, value }))
+    .sort((a, b) => b.value - a.value);
 }
 
 function toRadarData(items: { label: string; value: number }[]) {

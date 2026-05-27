@@ -13,11 +13,11 @@ export function BreakdownList({
 
   return (
     <ul className="space-y-3.5">
-      {items.map((item) => {
+      {items.map((item, index) => {
         const width = Math.max(4, Math.round((item.value / max) * 100));
 
         return (
-          <li key={item.label}>
+          <li key={`${item.label}-${index}`}>
             <div className="mb-1.5 flex items-baseline justify-between gap-3">
               <span
                 className="min-w-0 truncate text-[13px] font-medium text-admin-fg"
