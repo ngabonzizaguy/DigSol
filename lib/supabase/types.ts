@@ -4,7 +4,11 @@
 export type ContentStatus = "draft" | "published" | "archived";
 export type SegmentKind = "smb" | "midmarket" | "enterprise";
 export type OrbColor = "mint" | "peach" | "lavender" | "sky" | "rose";
-export type LeadKind = "contact" | "consultation" | "newsletter" | "guide";
+export type LeadKind = "contact" | "consultation" | "newsletter" | "guide" | "quick_start";
+
+export type BudgetCurrency = "RWF" | "USD";
+export type PreferredChannel = "email" | "whatsapp" | "phone";
+export type LeadAttachmentKind = "image" | "document" | "link" | "voice";
 export type LeadStatus =
   | "new"
   | "in_progress"
@@ -47,6 +51,13 @@ export type Industry = {
 
 export type CaseStudyMetric = { label: string; value: string };
 
+export type CaseStudyMediaItem = {
+  url: string;
+  mime?: string;
+  alt?: string;
+  caption?: string;
+};
+
 export type CaseStudy = {
   id: string;
   slug: string;
@@ -65,6 +76,12 @@ export type CaseStudy = {
   status: ContentStatus;
   featured: boolean;
   sort_order: number;
+  project_url: string | null;
+  show_project_url: boolean;
+  customer_quote: string | null;
+  customer_name: string | null;
+  customer_role: string | null;
+  media_gallery: CaseStudyMediaItem[];
   created_at: string;
   updated_at: string;
 };
@@ -155,8 +172,32 @@ export type Lead = {
   replied_at: string | null;
   closed_at: string | null;
   first_response_at: string | null;
+  phone: string | null;
+  country_code: string | null;
+  phone_dial_code: string | null;
+  budget_min: number | null;
+  budget_max: number | null;
+  budget_currency: BudgetCurrency | null;
+  budget_unsure: boolean;
+  preferred_channel: PreferredChannel | null;
+  preferred_window: string | null;
+  service_slugs: string[];
+  custom_request: string | null;
   created_at: string;
   updated_at: string;
+};
+
+export type LeadAttachment = {
+  id: string;
+  lead_id: string;
+  kind: LeadAttachmentKind;
+  storage_path: string | null;
+  url: string | null;
+  original_name: string | null;
+  mime: string | null;
+  size_bytes: number | null;
+  duration_ms: number | null;
+  created_at: string;
 };
 
 export type LeadMessage = {
@@ -195,6 +236,17 @@ export type MediaItem = {
   alt: string | null;
   uploaded_by: string | null;
   created_at: string;
+};
+
+export type Profile = {
+  id: string;
+  email: string;
+  name: string | null;
+  role: UserRole;
+  avatar_url: string | null;
+  permissions: Record<string, string[]> | null;
+  created_at: string;
+  updated_at: string;
 };
 
 export type ActivityLog = {
