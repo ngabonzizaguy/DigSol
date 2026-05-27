@@ -36,10 +36,10 @@ export default async function BookConsultationPage() {
 
       <Section>
         <Container>
-          <div className="grid grid-cols-1 gap-12 lg:grid-cols-[1.3fr_1fr]">
+          <div className="grid min-w-0 grid-cols-1 gap-12 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)]">
             <PageSection pageId="book_consultation" sectionId="form">
-              <FadeIn>
-                <div className="rounded-2xl border border-hairline bg-surface-card p-8 shadow-soft lg:p-10">
+              <FadeIn className="min-w-0">
+                <div className="min-w-0 overflow-hidden rounded-2xl border border-hairline bg-surface-card p-5 shadow-soft sm:p-8 lg:p-10">
                   <ConsultationForm
                     whatsappNumber={qs.whatsapp.number_e164 || undefined}
                     defaultCountry={qs.whatsapp.default_country}

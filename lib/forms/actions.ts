@@ -1,8 +1,8 @@
 "use server";
 
 import { z } from "zod";
-import { createClient } from "@/lib/supabase/server";
 import { logActivity } from "@/lib/admin/activity";
+import { getPublicLeadClient, publicLeadErrorMessage } from "@/lib/forms/public-lead-client";
 
 const contactSchema = z.object({
   name: z.string().min(1).max(160),
@@ -47,7 +47,7 @@ export async function submitContact(_prev: FormResult | null, formData: FormData
   const parsed = contactSchema.safeParse(raw);
   if (!parsed.success) return { ok: false, error: "Please fix the highlighted fields." };
 
-  const supabase = await createClient();
+  const supabase = getPublicLeadClient();
   const phoneClean = parsed.data.phone ? parsed.data.phone.replace(/[^\d]/g, "") : null;
   const { data, error } = await supabase
     .from("leads")
@@ -65,7 +65,7 @@ export async function submitContact(_prev: FormResult | null, formData: FormData
     })
     .select("id")
     .single();
-  if (error) return { ok: false, error: error.message };
+  if (error) return { ok: false, error: publicLeadErrorMessage(error) };
 
   await logActivity({ entity: "leads", entity_id: data.id, action: "create:contact" });
   return { ok: true, redirect: "/thank-you" };
@@ -86,7 +86,7 @@ export async function submitConsultation(_prev: FormResult | null, formData: For
   const parsed = consultationSchema.safeParse(raw);
   if (!parsed.success) return { ok: false, error: "Please fix the highlighted fields." };
 
-  const supabase = await createClient();
+  const supabase = getPublicLeadClient();
   const phoneClean = parsed.data.phone ? parsed.data.phone.replace(/[^\d]/g, "") : null;
   const { data, error } = await supabase
     .from("leads")
@@ -105,7 +105,7 @@ export async function submitConsultation(_prev: FormResult | null, formData: For
     })
     .select("id")
     .single();
-  if (error) return { ok: false, error: error.message };
+  if (error) return { ok: false, error: publicLeadErrorMessage(error) };
 
   await logActivity({ entity: "leads", entity_id: data.id, action: "create:consultation" });
   return { ok: true, redirect: "/thank-you" };
@@ -115,12 +115,12 @@ export async function subscribeNewsletter(_prev: FormResult | null, formData: Fo
   const raw = { email: String(formData.get("email") ?? "") };
   const parsed = newsletterSchema.safeParse(raw);
   if (!parsed.success) return { ok: false, error: "Enter a valid email" };
-  const supabase = await createClient();
+  const supabase = getPublicLeadClient();
   const { error } = await supabase.from("leads").insert({
     kind: "newsletter",
     email: parsed.data.email,
     payload: { source: "footer" },
   });
-  if (error) return { ok: false, error: error.message };
+  if (error) return { ok: false, error: publicLeadErrorMessage(error) };
   return { ok: true };
 }

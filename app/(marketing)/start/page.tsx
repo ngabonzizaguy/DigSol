@@ -17,11 +17,11 @@ export default async function QuickStartPage() {
   return (
     <>
       <PageSection pageId="start" sectionId="hero">
-        <Section className="pt-section-sm md:pt-section">
+        <Section className="pt-28 md:pt-section">
           <Container>
             <FadeIn>
-              <div className="max-w-2xl space-y-4">
-                <p className="text-xs uppercase tracking-[0.18em] text-muted">Quick Start</p>
+              <div className="max-w-2xl space-y-5">
+                <p className="text-xs uppercase tracking-[0.2em] text-muted">Quick Start</p>
                 <h1 className="font-display text-display-xl tracking-tight text-ink">
                   {config.copy.welcome.title}
                 </h1>
@@ -32,7 +32,7 @@ export default async function QuickStartPage() {
         </Section>
       </PageSection>
 
-      <Section>
+      <Section className="pt-0 md:pt-4">
         <Container>
           <div className="grid min-w-0 grid-cols-1 gap-10 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
             <PageSection pageId="start" sectionId="flow">

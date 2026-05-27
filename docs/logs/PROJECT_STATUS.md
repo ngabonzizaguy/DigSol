@@ -74,6 +74,8 @@
 | ~~Set WhatsApp number~~ | **Done (2026-05-27)** — `site_settings.integrations.quick_start.whatsapp.number_e164` = `+250784928786` |
 | Resend notifications | Quick Start leads currently use the same notification path as other leads (mock unless `RESEND_API_KEY` is set) |
 | Manual smoke | Re-test Quick Start with doc + voice upload; confirm admin Attachments panel shows files and Download works; prior test lead files are not recoverable (only links backfilled from payload) |
+| **Public form RLS fix (2026-05-27)** | Quick Start / contact / consultation / newsletter inserts use server `getServiceSupabase()` — anon `.insert().select()` failed for guests (no SELECT policy on `leads`) |
+| **Mobile form layout (2026-05-27)** | `/start`, `/book-consultation`, contact forms: `min-w-0`, stacked buttons, header spacing under fixed nav |
 
 ---
 

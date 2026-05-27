@@ -240,19 +240,19 @@ export function QuickStartFlow({ variant = "modal" }: QuickStartFlowProps) {
       </AnimatePresence>
 
       {!stepIsSuccess && (
-        <div className="flex items-center justify-between gap-3 border-t border-hairline pt-4">
-          <div>
+        <div className="flex min-w-0 flex-col gap-3 border-t border-hairline pt-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="min-w-0">
             {draft.step > 1 ? (
-              <Button type="button" variant="ghost" size="md" onClick={prevStep}>
+              <Button type="button" variant="ghost" size="md" className="w-full sm:w-auto" onClick={prevStep}>
                 <ArrowLeft className="h-4 w-4" /> Back
               </Button>
             ) : (
-              <Button type="button" variant="ghost" size="md" onClick={closeFlow}>
+              <Button type="button" variant="ghost" size="md" className="w-full sm:w-auto" onClick={closeFlow}>
                 Maybe later
               </Button>
             )}
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex min-w-0 flex-wrap items-stretch justify-end gap-2 sm:items-center">
             {draft.step === 4 && (
               <Button
                 type="button"
@@ -270,12 +270,12 @@ export function QuickStartFlow({ variant = "modal" }: QuickStartFlowProps) {
               </Button>
             )}
             {draft.step < 7 && (
-              <Button type="button" size="md" onClick={handleNext}>
+              <Button type="button" size="md" className="w-full sm:w-auto" onClick={handleNext}>
                 Next <ArrowRight className="h-4 w-4" />
               </Button>
             )}
             {draft.step === 7 && (
-              <Button type="button" size="md" disabled={submitting} onClick={handleSubmit}>
+              <Button type="button" size="md" className="w-full sm:w-auto" disabled={submitting} onClick={handleSubmit}>
                 {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
                 {submitting ? "Sending…" : "Send it"}
               </Button>

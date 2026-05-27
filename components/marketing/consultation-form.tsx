@@ -48,21 +48,21 @@ export function ConsultationForm({ whatsappNumber, defaultCountry = "RW" }: Cons
     : null;
 
   return (
-    <form action={action} className="grid gap-4">
-      <div className="grid gap-4 md:grid-cols-2">
-        <label className="space-y-1.5">
+    <form action={action} className="grid min-w-0 gap-4">
+      <div className="grid min-w-0 grid-cols-1 gap-4 md:grid-cols-2">
+        <label className="min-w-0 space-y-1.5">
           <span className="text-sm font-medium text-body-strong">Name</span>
           <Input name="name" required value={name} onChange={(e) => setName(e.target.value)} />
         </label>
-        <label className="space-y-1.5">
+        <label className="min-w-0 space-y-1.5">
           <span className="text-sm font-medium text-body-strong">Email</span>
           <Input type="email" name="email" required />
         </label>
-        <label className="space-y-1.5">
+        <label className="min-w-0 space-y-1.5">
           <span className="text-sm font-medium text-body-strong">Company</span>
           <Input name="company" />
         </label>
-        <label className="space-y-1.5">
+        <label className="min-w-0 space-y-1.5 md:col-span-2">
           <span className="text-sm font-medium text-body-strong">Phone (optional)</span>
           <PhoneInput
             countryCode={country?.code}
@@ -71,9 +71,9 @@ export function ConsultationForm({ whatsappNumber, defaultCountry = "RW" }: Cons
             onCountryChange={(code) => setCountryCode(code)}
           />
         </label>
-        <label className="space-y-1.5">
+        <label className="min-w-0 space-y-1.5">
           <span className="text-sm font-medium text-body-strong">Company size</span>
-          <select name="company_size" className="flex h-11 w-full rounded-pill border border-hairline bg-surface-card px-4 text-sm">
+          <select name="company_size" className="flex h-11 w-full min-w-0 rounded-lg border border-hairline-strong bg-surface-card px-4 text-[15px] text-ink">
             <option>1–10</option>
             <option>11–50</option>
             <option>51–200</option>
@@ -81,9 +81,9 @@ export function ConsultationForm({ whatsappNumber, defaultCountry = "RW" }: Cons
             <option>1,000+</option>
           </select>
         </label>
-        <label className="space-y-1.5">
+        <label className="min-w-0 space-y-1.5">
           <span className="text-sm font-medium text-body-strong">Timeline</span>
-          <select name="timeline" className="flex h-11 w-full rounded-pill border border-hairline bg-surface-card px-4 text-sm">
+          <select name="timeline" className="flex h-11 w-full min-w-0 rounded-lg border border-hairline-strong bg-surface-card px-4 text-[15px] text-ink">
             <option>0–30 days</option>
             <option>1–3 months</option>
             <option>3–6 months</option>
@@ -92,22 +92,24 @@ export function ConsultationForm({ whatsappNumber, defaultCountry = "RW" }: Cons
           </select>
         </label>
       </div>
-      <label className="space-y-1.5">
+      <label className="min-w-0 space-y-1.5">
         <span className="text-sm font-medium text-body-strong">What outcomes are you optimising for?</span>
         <Textarea name="intent" rows={5} required value={intent} onChange={(e) => setIntent(e.target.value)} />
       </label>
-      <div className="flex flex-wrap justify-end gap-2 pt-2">
+      <div className="flex min-w-0 flex-col gap-2 pt-2 sm:flex-row sm:flex-wrap sm:justify-end">
         {waLink ? (
           <a
             href={waLink}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 rounded-full border border-hairline-strong bg-surface-card px-5 py-2 text-[15px] text-ink hover:bg-surface-strong transition-colors"
+            className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-full border border-hairline-strong bg-surface-card px-5 text-[15px] text-ink hover:bg-surface-strong transition-colors sm:w-auto"
           >
             <MessageCircle className="h-4 w-4" /> Send via WhatsApp
           </a>
         ) : null}
-        <Submit />
+        <div className="w-full sm:w-auto [&_button]:w-full sm:[&_button]:w-auto">
+          <Submit />
+        </div>
       </div>
     </form>
   );

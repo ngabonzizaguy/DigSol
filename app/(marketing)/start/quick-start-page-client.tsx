@@ -56,7 +56,7 @@ export function QuickStartPageClient() {
   }
 
   return (
-    <div ref={wrapperRef} className="relative">
+    <div ref={wrapperRef} className="relative isolate min-w-0 w-full overflow-x-hidden">
       {/* Decorative parallax orbs (atmosphere only). */}
       <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
         <div

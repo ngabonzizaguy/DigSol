@@ -1,8 +1,8 @@
 "use server";
 
 import { z } from "zod";
-import { createClient } from "@/lib/supabase/server";
 import { getServiceSupabase } from "@/lib/supabase/service";
+import { getPublicLeadClient, publicLeadErrorMessage } from "@/lib/forms/public-lead-client";
 import { logActivity } from "@/lib/admin/activity";
 import type { LeadAttachmentKind } from "@/lib/supabase/types";
 
@@ -104,7 +104,7 @@ export async function createQuickStartLead(input: QuickStartInput): Promise<Quic
   }
   const v = parsed.data;
 
-  const supabase = await createClient();
+  const supabase = getPublicLeadClient();
   const phoneClean = v.phone ? v.phone.replace(/[^\d]/g, "") : null;
 
   const messageParts: string[] = [];
@@ -146,7 +146,7 @@ export async function createQuickStartLead(input: QuickStartInput): Promise<Quic
     .single();
 
   if (error || !leadRow) {
-    return { ok: false, error: error?.message ?? "Could not save your request." };
+    return { ok: false, error: publicLeadErrorMessage(error) };
   }
 
   const leadId = leadRow.id as string;

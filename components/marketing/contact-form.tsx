@@ -67,13 +67,13 @@ export function ContactForm({ aiAssistEnabled = false, whatsappNumber, defaultCo
     : null;
 
   return (
-    <form action={action} className="grid gap-4">
-      <div className="grid gap-4 md:grid-cols-2">
-        <label className="space-y-1.5">
+    <form action={action} className="grid min-w-0 gap-4">
+      <div className="grid min-w-0 grid-cols-1 gap-4 md:grid-cols-2">
+        <label className="min-w-0 space-y-1.5">
           <span className="text-sm font-medium text-body-strong">Name</span>
           <Input name="name" required value={name} onChange={(e) => setName(e.target.value)} />
         </label>
-        <label className="space-y-1.5">
+        <label className="min-w-0 space-y-1.5">
           <span className="text-sm font-medium text-body-strong">Email</span>
           <Input type="email" name="email" required />
         </label>
@@ -81,11 +81,11 @@ export function ContactForm({ aiAssistEnabled = false, whatsappNumber, defaultCo
           <span className="text-sm font-medium text-body-strong">Company</span>
           <Input name="company" />
         </label>
-        <label className="space-y-1.5">
+        <label className="min-w-0 space-y-1.5">
           <span className="text-sm font-medium text-body-strong">Role</span>
           <Input name="role" />
         </label>
-        <label className="space-y-1.5 md:col-span-2">
+        <label className="min-w-0 space-y-1.5 md:col-span-2">
           <span className="text-sm font-medium text-body-strong">Phone (optional)</span>
           <PhoneInput
             countryCode={country?.code}
@@ -95,16 +95,17 @@ export function ContactForm({ aiAssistEnabled = false, whatsappNumber, defaultCo
           />
         </label>
       </div>
-      <label className="space-y-1.5">
+      <label className="min-w-0 space-y-1.5">
         <span className="text-sm font-medium text-body-strong">How can we help?</span>
         <Textarea name="message" rows={5} required value={message} onChange={(e) => setMessage(e.target.value)} />
       </label>
-      <div className="flex flex-wrap items-center justify-end gap-2 pt-2">
+      <div className="flex min-w-0 flex-col gap-2 pt-2 sm:flex-row sm:flex-wrap sm:items-center sm:justify-end">
         {aiAssistEnabled ? (
           <Button
             type="button"
             variant="outline"
             size="md"
+            className="w-full sm:w-auto"
             disabled={aiPending}
             onClick={improveMessage}
           >
@@ -116,12 +117,14 @@ export function ContactForm({ aiAssistEnabled = false, whatsappNumber, defaultCo
             href={waLink}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 rounded-full border border-hairline-strong bg-surface-card px-5 py-2 text-[15px] text-ink hover:bg-surface-strong transition-colors"
+            className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-full border border-hairline-strong bg-surface-card px-5 text-[15px] text-ink hover:bg-surface-strong transition-colors sm:w-auto"
           >
             <MessageCircle className="h-4 w-4" /> Send via WhatsApp
           </a>
         ) : null}
-        <Submit />
+        <div className="w-full sm:w-auto [&_button]:w-full sm:[&_button]:w-auto">
+          <Submit />
+        </div>
       </div>
     </form>
   );
