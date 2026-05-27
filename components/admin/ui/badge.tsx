@@ -36,11 +36,17 @@ export function StatusBadge({ status }: { status: string }) {
           ? "danger"
           : status === "new"
             ? "info"
-            : status === "won"
-              ? "success"
-              : status === "lost"
-                ? "danger"
-                : "neutral";
+            : status === "in_progress"
+              ? "warning"
+              : status === "replied"
+                ? "accent"
+                : status === "closed"
+                  ? "neutral"
+                  : status === "won"
+                    ? "success"
+                    : status === "lost"
+                      ? "danger"
+                      : "neutral";
   return (
     <Badge tone={tone as "success" | "warning" | "danger" | "info" | "neutral"}>
       <span className="size-1.5 rounded-full bg-current opacity-70" />

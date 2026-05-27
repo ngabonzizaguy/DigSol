@@ -2,9 +2,14 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Mail, Phone } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
+import { isEmailMockMode } from "@/lib/email";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/admin/ui/card";
 import { StatusBadge, Badge } from "@/components/admin/ui/badge";
 import { LeadDetailControls } from "@/components/admin/leads/lead-detail-controls";
+import { LeadReplyComposer } from "@/components/admin/leads/lead-reply-composer";
+import { LeadAiAssist } from "@/components/admin/leads/lead-ai-assist";
+import { LeadThread } from "@/components/admin/leads/lead-thread";
+import { LeadPipelineBar } from "@/components/admin/leads/lead-pipeline-bar";
 import type { Lead } from "@/lib/supabase/types";
 
 export const dynamic = "force-dynamic";
@@ -16,18 +21,26 @@ export default async function LeadDetailPage({ params }: { params: Promise<{ id:
   if (!data) notFound();
   const lead = data as Lead;
 
+  const { data: messages } = await supabase
+    .from("lead_messages")
+    .select("id, direction, channel, subject, body, to_email, from_email, provider, created_at")
+    .eq("lead_id", lead.id)
+    .order("created_at", { ascending: true });
+
   const { data: history } = await supabase
     .from("activity_log")
-    .select("id, action, created_at, actor_id")
+    .select("id, action, created_at, diff")
     .eq("entity", "leads")
     .eq("entity_id", lead.id)
     .order("created_at", { ascending: false })
     .limit(20);
 
+  const mockMode = isEmailMockMode();
+
   return (
     <div className="space-y-4">
-      <header className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
+      <header className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex flex-wrap items-center gap-3">
           <Link href="/admin/leads" className="flex items-center gap-1 text-[12px] text-admin-fg-subtle hover:text-admin-fg">
             <ArrowLeft className="size-3" /> Leads
           </Link>
@@ -40,13 +53,15 @@ export default async function LeadDetailPage({ params }: { params: Promise<{ id:
 
       <div className="grid gap-4 lg:grid-cols-3">
         <div className="space-y-4 lg:col-span-2">
+          <LeadPipelineBar current={lead.status} />
+
           <Card>
-            <CardHeader><CardTitle>Message</CardTitle></CardHeader>
+            <CardHeader><CardTitle>Original submission</CardTitle></CardHeader>
             <CardContent className="space-y-3">
               <div className="rounded-md border border-admin-border bg-admin-elevated p-3 text-[13px] text-admin-fg whitespace-pre-wrap">
                 {lead.message ?? lead.intent ?? "—"}
               </div>
-              <div className="grid grid-cols-2 gap-3 text-[12px]">
+              <div className="grid grid-cols-2 gap-3 text-[12px] sm:grid-cols-3">
                 <Field label="Email"><a className="inline-flex items-center gap-1 text-admin-fg underline-offset-4 hover:underline" href={`mailto:${lead.email}`}><Mail className="size-3" />{lead.email}</a></Field>
                 <Field label="Company">{lead.company ?? "—"}</Field>
                 <Field label="Role">{lead.role ?? "—"}</Field>
@@ -63,6 +78,8 @@ export default async function LeadDetailPage({ params }: { params: Promise<{ id:
             </CardContent>
           </Card>
 
+          <LeadThread messages={messages ?? []} />
+
           <Card>
             <CardHeader><CardTitle>Activity</CardTitle></CardHeader>
             <CardContent>
@@ -71,7 +88,7 @@ export default async function LeadDetailPage({ params }: { params: Promise<{ id:
                   {history.map((h) => (
                     <li key={h.id} className="flex items-start justify-between gap-3">
                       <span className="text-admin-fg-muted">{h.action}</span>
-                      <span className="text-admin-fg-subtle">{new Date(h.created_at).toLocaleString()}</span>
+                      <span className="shrink-0 text-admin-fg-subtle">{new Date(h.created_at).toLocaleString()}</span>
                     </li>
                   ))}
                 </ul>
@@ -82,7 +99,11 @@ export default async function LeadDetailPage({ params }: { params: Promise<{ id:
           </Card>
         </div>
 
-        <LeadDetailControls lead={lead} />
+        <div className="space-y-4">
+          <LeadReplyComposer lead={lead} mockMode={mockMode} />
+          <LeadAiAssist lead={lead} />
+          <LeadDetailControls lead={lead} />
+        </div>
       </div>
     </div>
   );

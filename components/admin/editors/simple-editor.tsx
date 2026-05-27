@@ -13,6 +13,7 @@ import { FormField } from "@/components/admin/ui/form-field";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/admin/ui/card";
 import { StatusBadge } from "@/components/admin/ui/badge";
 import { slugify } from "@/lib/admin/slugify";
+import { CoverImageField } from "@/components/admin/media/cover-image-field";
 import type { GenericActionResult } from "@/lib/admin/generic-actions";
 
 export type FieldDef =
@@ -20,7 +21,8 @@ export type FieldDef =
   | { name: string; label: string; type: "textarea"; required?: boolean; hint?: string; rows?: number; maxLength?: number }
   | { name: string; label: string; type: "list"; hint?: string; rows?: number }
   | { name: string; label: string; type: "select"; options: { value: string; label: string }[]; required?: boolean }
-  | { name: string; label: string; type: "switch" };
+  | { name: string; label: string; type: "switch" }
+  | { name: string; label: string; type: "cover_image"; hint?: string };
 
 export type SimpleEditorProps = {
   entity: string;
@@ -161,7 +163,23 @@ export function SimpleEditor({
         <CardContent className="grid gap-4 md:grid-cols-2">
           {fields.map((f) => {
             const fieldError = errors[f.name]?.[0];
-            const span = f.type === "textarea" || f.type === "list" ? "md:col-span-2" : "";
+            const span = f.type === "textarea" || f.type === "list" || f.type === "cover_image" ? "md:col-span-2" : "";
+
+            if (f.type === "cover_image") {
+              return (
+                <div key={f.name} className={span}>
+                  <CoverImageField
+                    name={f.name}
+                    label={f.label}
+                    hint={"hint" in f ? f.hint : undefined}
+                    value={values[f.name] ?? ""}
+                    onChange={(url) => setValue(f.name, url)}
+                  />
+                  {fieldError ? <p className="mt-1 text-[12px] text-error">{fieldError}</p> : null}
+                </div>
+              );
+            }
+
             return (
               <FormField
                 key={f.name}

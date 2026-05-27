@@ -24,10 +24,21 @@ export function PageViewLogger() {
   useEffect(() => {
     if (!pathname || pathname.startsWith("/admin")) return;
     const session_id = getSessionId();
+    const params = new URLSearchParams(window.location.search);
+    const utm = {
+      utm_source: params.get("utm_source"),
+      utm_medium: params.get("utm_medium"),
+      utm_campaign: params.get("utm_campaign"),
+    };
     fetch("/api/pageviews", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ path: pathname, referrer: document.referrer || null, session_id }),
+      body: JSON.stringify({
+        path: pathname,
+        referrer: document.referrer || null,
+        session_id,
+        ...utm,
+      }),
       keepalive: true,
     }).catch(() => {});
   }, [pathname]);

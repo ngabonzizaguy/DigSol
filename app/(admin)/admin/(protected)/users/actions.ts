@@ -3,6 +3,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { createClient, createServiceClient } from "@/lib/supabase/server";
 import { logActivity } from "@/lib/admin/activity";
+import type { PermissionOverrides } from "@/lib/admin/permissions";
 
 const roleSchema = z.enum(["admin", "editor", "viewer"]);
 
@@ -59,6 +60,32 @@ export async function inviteUser(_prev: InviteResult | null, formData: FormData)
   } catch (e) {
     return { ok: false, error: e instanceof Error ? e.message : "Failed to invite" };
   }
+}
+
+export async function updateUserPermissions(userId: string, permissions: PermissionOverrides | null) {
+  await requireAdmin();
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("profiles")
+    .update({ permissions: permissions && Object.keys(permissions).length ? permissions : null })
+    .eq("id", userId);
+  if (error) throw new Error(error.message);
+  await logActivity({
+    entity: "profiles",
+    entity_id: userId,
+    action: "permissions:update",
+    diff: { permissions },
+  });
+  revalidatePath("/admin/users");
+}
+
+export async function resetUserPermissions(userId: string) {
+  await requireAdmin();
+  const supabase = await createClient();
+  const { error } = await supabase.from("profiles").update({ permissions: null }).eq("id", userId);
+  if (error) throw new Error(error.message);
+  await logActivity({ entity: "profiles", entity_id: userId, action: "permissions:reset" });
+  revalidatePath("/admin/users");
 }
 
 export async function removeUser(userId: string) {

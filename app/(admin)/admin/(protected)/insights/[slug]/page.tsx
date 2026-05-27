@@ -32,7 +32,7 @@ export default async function EditInsightPage({ params }: { params: Promise<{ sl
         { name: "author_role", label: "Author role", type: "text", required: true },
         { name: "category", label: "Category", type: "text", required: true },
         { name: "read_time", label: "Read time", type: "text", required: true },
-        { name: "cover_url", label: "Cover URL", type: "url" },
+        { name: "cover_url", label: "Cover image", type: "cover_image", hint: "Shown at the top of the article on the public site." },
         { name: "status", label: "Status", type: "select", options: [{ value: "draft", label: "Draft" }, { value: "published", label: "Published" }, { value: "archived", label: "Archived" }] },
         { name: "published_at", label: "Publish date", type: "text" },
       ]}

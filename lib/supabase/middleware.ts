@@ -32,16 +32,18 @@ export async function updateSession(request: NextRequest) {
   const isAdminLogin = url.pathname === "/admin/login";
 
   let role: string | null = null;
+  let permissions: Record<string, unknown> | null = null;
   if (user) {
     const { data: profile } = await supabase
       .from("profiles")
-      .select("role")
+      .select("role, permissions")
       .eq("id", user.id)
       .maybeSingle();
     role = profile?.role ?? null;
+    permissions = (profile?.permissions as Record<string, unknown> | null) ?? null;
   }
 
-  const canAccessAdmin = role === "admin" || role === "editor";
+  const canAccessAdmin = role === "admin" || role === "editor" || role === "viewer";
 
   if (isAdminRoute && !isAdminLogin && !user) {
     url.pathname = "/admin/login";
@@ -54,6 +56,21 @@ export async function updateSession(request: NextRequest) {
     url.searchParams.set("error", "unauthorized");
     url.searchParams.delete("next");
     return NextResponse.redirect(url);
+  }
+
+  if (isAdminRoute && !isAdminLogin && user && role && role !== "admin") {
+    const { canAccessRoute } = await import("@/lib/admin/permissions");
+    const overrides = permissions as import("@/lib/admin/permissions").PermissionOverrides | null;
+    if (
+      !canAccessRoute(
+        role as "editor" | "viewer",
+        url.pathname,
+        overrides
+      )
+    ) {
+      url.pathname = "/admin";
+      return NextResponse.redirect(url);
+    }
   }
 
   if (isAdminLogin && user && canAccessAdmin) {

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { Container, Section } from "@/components/ui/container";
 import { CtaBand } from "@/components/marketing/cta-band";
 import { Breadcrumbs } from "@/components/marketing/breadcrumbs";
@@ -43,6 +44,18 @@ export default async function InsightDetailPage({ params }: { params: Promise<{ 
                 <Badge>{post.category}</Badge>
                 <span className="text-[12px] text-muted">{post.readTime}</span>
               </div>
+              {post.cover_url ? (
+                <div className="relative mt-6 aspect-[21/9] w-full overflow-hidden rounded-2xl border border-hairline">
+                  <Image
+                    src={post.cover_url}
+                    alt=""
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 100vw, 768px"
+                    priority
+                  />
+                </div>
+              ) : null}
               <h1 className="mt-5 text-balance font-display text-display-xl text-ink">{post.title}</h1>
               <p className="mt-5 text-pretty text-[18px] leading-relaxed text-body">{post.excerpt}</p>
               <div className="mt-8 flex items-center gap-3 border-t border-hairline pt-5">

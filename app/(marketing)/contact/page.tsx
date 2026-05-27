@@ -21,6 +21,7 @@ export default async function ContactPage() {
   const hero = pageHeroContent(store, "contact");
   const email = settings.contact.email?.trim() || site.email;
   const phone = settings.contact.phone?.trim() || site.phone;
+  const formSection = getSectionContent<{ ai_assist_enabled?: boolean }>(store, "contact", "form");
   const sidebar = getSectionContent<{
     contact_title?: string;
     locations?: string;
@@ -41,7 +42,7 @@ export default async function ContactPage() {
             <PageSection pageId="contact" sectionId="form">
               <FadeIn>
                 <div className="rounded-2xl border border-hairline bg-surface-card p-8 shadow-soft lg:p-10">
-                  <ContactForm />
+                  <ContactForm aiAssistEnabled={formSection.ai_assist_enabled === true} />
                   <p className="mt-5 text-[12px] text-muted">
                     By submitting this form you agree to our privacy policy. We never share your details.
                   </p>

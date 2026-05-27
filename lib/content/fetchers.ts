@@ -107,6 +107,7 @@ type SupabaseInsightRow = {
   read_time: string;
   published_at: string | null;
   created_at: string;
+  cover_url: string | null;
 };
 
 function normalizeInsight(row: SupabaseInsightRow): LocalInsight {
@@ -120,6 +121,7 @@ function normalizeInsight(row: SupabaseInsightRow): LocalInsight {
     readTime: row.read_time,
     category: row.category as LocalInsight["category"],
     date: row.published_at ?? row.created_at,
+    cover_url: row.cover_url,
   };
 }
 

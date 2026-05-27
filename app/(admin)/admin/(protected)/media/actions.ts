@@ -1,7 +1,19 @@
 "use server";
+
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { logActivity } from "@/lib/admin/activity";
+import { getMediaPublicUrl } from "@/lib/admin/media";
+import type { MediaItem } from "@/lib/supabase/types";
+
+export type MediaPickerItem = MediaItem & { url: string };
+
+export async function listMediaForPicker(): Promise<MediaPickerItem[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase.from("media").select("*").order("created_at", { ascending: false }).limit(300);
+  if (error) throw new Error(error.message);
+  return ((data ?? []) as MediaItem[]).map((m) => ({ ...m, url: getMediaPublicUrl(m.path) }));
+}
 
 export async function recordMediaUpload(input: {
   path: string;

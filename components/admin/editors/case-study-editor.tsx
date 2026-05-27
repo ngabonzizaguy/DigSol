@@ -14,6 +14,7 @@ import { FormField } from "@/components/admin/ui/form-field";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/admin/ui/card";
 import { StatusBadge } from "@/components/admin/ui/badge";
 import { slugify } from "@/lib/admin/slugify";
+import { CoverImageField } from "@/components/admin/media/cover-image-field";
 import type { CaseStudy, OrbColor, SegmentKind, ContentStatus, CaseStudyMetric } from "@/lib/supabase/types";
 
 function SaveBtn() {
@@ -197,9 +198,7 @@ export function CaseStudyEditor({ initial }: { initial?: CaseStudy }) {
           <Card>
             <CardHeader><CardTitle>Visual</CardTitle></CardHeader>
             <CardContent className="space-y-3">
-              <FormField label="Cover URL" hint="Optional hero image (Storage path or external URL)">
-                <Input name="cover_url" value={cover} onChange={(e) => setCover(e.target.value)} />
-              </FormField>
+              <CoverImageField value={cover} onChange={setCover} />
               <FormField label="Orb color">
                 <div className="grid grid-cols-5 gap-2">
                   {(["mint", "peach", "lavender", "sky", "rose"] as const).map((o) => (
