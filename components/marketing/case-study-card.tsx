@@ -22,13 +22,22 @@ export function CaseStudyCard({ study, featured }: { study: CaseStudy; featured?
       )}
     >
       <div className={cn("relative aspect-[16/9] overflow-hidden bg-canvas-soft", featured && "aspect-[21/9]")}>
-        <div
-          aria-hidden
-          className={cn(
-            "absolute inset-0 bg-gradient-to-br to-transparent opacity-90 transition-transform duration-700 group-hover:scale-110",
-            orbBg[study.orb]
-          )}
-        />
+        {study.cover_url ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={study.cover_url}
+            alt={study.title}
+            className="absolute inset-0 size-full object-cover transition-transform duration-700 group-hover:scale-105"
+          />
+        ) : (
+          <div
+            aria-hidden
+            className={cn(
+              "absolute inset-0 bg-gradient-to-br to-transparent opacity-90 transition-transform duration-700 group-hover:scale-110",
+              orbBg[study.orb]
+            )}
+          />
+        )}
         <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent" />
         <div className="absolute left-6 top-6 flex gap-2">
           <Badge variant="outline" className="bg-white/70 backdrop-blur">

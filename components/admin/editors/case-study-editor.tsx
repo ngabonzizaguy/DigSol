@@ -4,18 +4,25 @@ import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
 import { useEffect, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { toast } from "sonner";
-import { ArrowLeft, Plus, Trash2, X } from "lucide-react";
+import { Plus, Trash2, X } from "lucide-react";
+import { EditorFormHeader } from "@/components/admin/editors/editor-form-header";
 import { upsertCaseStudy, deleteCaseStudy, setCaseStudyStatus } from "@/app/(admin)/admin/(protected)/work/actions";
 import { Button } from "@/components/admin/ui/button";
 import { Input, Textarea } from "@/components/admin/ui/input";
 import { FormField } from "@/components/admin/ui/form-field";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/admin/ui/card";
-import { StatusBadge } from "@/components/admin/ui/badge";
 import { slugify } from "@/lib/admin/slugify";
 import { CoverImageField } from "@/components/admin/media/cover-image-field";
-import type { CaseStudy, OrbColor, SegmentKind, ContentStatus, CaseStudyMetric } from "@/lib/supabase/types";
+import { GalleryField } from "@/components/admin/media/gallery-field";
+import type {
+  CaseStudy,
+  OrbColor,
+  SegmentKind,
+  ContentStatus,
+  CaseStudyMetric,
+  CaseStudyMediaItem,
+} from "@/lib/supabase/types";
 
 function SaveBtn() {
   const { pending } = useFormStatus();
@@ -44,6 +51,12 @@ export function CaseStudyEditor({ initial }: { initial?: CaseStudy }) {
   const [featured, setFeatured] = useState(initial?.featured ?? false);
   const [sortOrder, setSortOrder] = useState(initial?.sort_order ?? 0);
   const [metrics, setMetrics] = useState<CaseStudyMetric[]>(initial?.metrics ?? [{ label: "", value: "" }]);
+  const [projectUrl, setProjectUrl] = useState(initial?.project_url ?? "");
+  const [showProjectUrl, setShowProjectUrl] = useState(initial?.show_project_url ?? false);
+  const [customerQuote, setCustomerQuote] = useState(initial?.customer_quote ?? "");
+  const [customerName, setCustomerName] = useState(initial?.customer_name ?? "");
+  const [customerRole, setCustomerRole] = useState(initial?.customer_role ?? "");
+  const [gallery, setGallery] = useState<CaseStudyMediaItem[]>(initial?.media_gallery ?? []);
 
   useEffect(() => {
     if (state?.ok) {
@@ -88,31 +101,27 @@ export function CaseStudyEditor({ initial }: { initial?: CaseStudy }) {
     <form action={action} className="space-y-4 pb-24">
       {initial?.id ? <input type="hidden" name="id" value={initial.id} /> : null}
 
-      <header className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <Link href="/admin/work" className="flex items-center gap-1 text-[12px] text-admin-fg-subtle hover:text-admin-fg">
-            <ArrowLeft className="size-3" /> Case studies
-          </Link>
-          <span className="text-admin-fg-subtle">/</span>
-          <h1 className="text-[16px] font-semibold tracking-tight text-admin-fg">
-            {initial ? initial.title : "New case study"}
-          </h1>
-          {initial ? <StatusBadge status={initial.status} /> : null}
-        </div>
-        <div className="flex items-center gap-2">
-          {initial ? (
-            <>
-              <Button type="button" variant="ghost" size="sm" onClick={handlePublishToggle} disabled={pending}>
-                {initial.status === "published" ? "Unpublish" : "Publish"}
-              </Button>
-              <Button type="button" variant="danger" size="icon" onClick={handleDelete} disabled={pending}>
-                <Trash2 className="size-3.5" />
-              </Button>
-            </>
-          ) : null}
-          <SaveBtn />
-        </div>
-      </header>
+      <EditorFormHeader
+        backHref="/admin/work"
+        backLabel="Work"
+        title={initial ? title || initial.title : "New project"}
+        status={initial?.status}
+        actions={
+          <>
+            {initial ? (
+              <>
+                <Button type="button" variant="ghost" size="sm" onClick={handlePublishToggle} disabled={pending}>
+                  {initial.status === "published" ? "Unpublish" : "Publish"}
+                </Button>
+                <Button type="button" variant="danger" size="icon" onClick={handleDelete} disabled={pending}>
+                  <Trash2 className="size-3.5" />
+                </Button>
+              </>
+            ) : null}
+            <SaveBtn />
+          </>
+        }
+      />
 
       <div className="grid gap-4 lg:grid-cols-3">
         <div className="space-y-4 lg:col-span-2">
@@ -163,6 +172,36 @@ export function CaseStudyEditor({ initial }: { initial?: CaseStudy }) {
               ))}
             </CardContent>
           </Card>
+
+          <Card>
+            <CardHeader><CardTitle>Project gallery</CardTitle></CardHeader>
+            <CardContent>
+              <GalleryField value={gallery} onChange={setGallery} />
+              <input type="hidden" name="media_gallery" value={JSON.stringify(gallery)} />
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader><CardTitle>Customer comment</CardTitle></CardHeader>
+            <CardContent className="space-y-3">
+              <FormField label="Quote" hint="Optional testimonial from the customer">
+                <Textarea
+                  name="customer_quote"
+                  value={customerQuote}
+                  onChange={(e) => setCustomerQuote(e.target.value)}
+                  rows={3}
+                />
+              </FormField>
+              <div className="grid grid-cols-2 gap-3">
+                <FormField label="Name">
+                  <Input name="customer_name" value={customerName} onChange={(e) => setCustomerName(e.target.value)} />
+                </FormField>
+                <FormField label="Role">
+                  <Input name="customer_role" value={customerRole} onChange={(e) => setCustomerRole(e.target.value)} />
+                </FormField>
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
         <div className="space-y-4">
@@ -209,6 +248,33 @@ export function CaseStudyEditor({ initial }: { initial?: CaseStudy }) {
               </FormField>
               <FormField label="Linked services" hint="One service slug per line">
                 <Textarea name="service_slugs" value={serviceSlugs} onChange={(e) => setServiceSlugs(e.target.value)} rows={3} />
+              </FormField>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader><CardTitle>Project link</CardTitle></CardHeader>
+            <CardContent className="space-y-3">
+              <FormField label="Project URL" hint="Live URL for the project (optional)">
+                <Input
+                  type="url"
+                  name="project_url"
+                  value={projectUrl}
+                  onChange={(e) => setProjectUrl(e.target.value)}
+                  placeholder="https://example.com"
+                />
+              </FormField>
+              <FormField label="Show link publicly">
+                <label className="flex items-center gap-2 text-[13px] text-admin-fg-muted">
+                  <input
+                    type="checkbox"
+                    name="show_project_url"
+                    checked={showProjectUrl}
+                    onChange={(e) => setShowProjectUrl(e.target.checked)}
+                    className="size-4 rounded border-admin-border"
+                  />
+                  Display the link on the public page
+                </label>
               </FormField>
             </CardContent>
           </Card>

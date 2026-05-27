@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition, useRef } from "react";
-import { Upload, Trash2, LayoutGrid, List } from "lucide-react";
+import { Upload, Trash2, LayoutGrid, List, Pencil } from "lucide-react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
@@ -10,6 +10,7 @@ import { Button } from "@/components/admin/ui/button";
 import { Input } from "@/components/admin/ui/input";
 import { EmptyState } from "@/components/admin/ui/empty-state";
 import { Card } from "@/components/admin/ui/card";
+import { MediaEditorDialog } from "@/components/admin/media/media-editor-dialog";
 import type { MediaItem } from "@/lib/supabase/types";
 
 type Item = MediaItem & { url: string };
@@ -20,6 +21,7 @@ export function MediaLibrary({ items }: { items: Item[] }) {
   const [uploading, setUploading] = useState(false);
   const [query, setQuery] = useState("");
   const [view, setView] = useState<"grid" | "list">("grid");
+  const [editing, setEditing] = useState<Item | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const filtered = items.filter((m) => {
@@ -191,6 +193,16 @@ export function MediaLibrary({ items }: { items: Item[] }) {
                     >
                       Copy
                     </button>
+                    {m.mime.startsWith("image/") ? (
+                      <button
+                        type="button"
+                        onClick={() => setEditing(m)}
+                        className="rounded p-1 hover:bg-admin-hover hover:text-admin-fg"
+                        aria-label="Edit image"
+                      >
+                        <Pencil className="size-3" />
+                      </button>
+                    ) : null}
                     <button
                       type="button"
                       onClick={() => handleDelete(m.id, m.path)}
@@ -233,6 +245,11 @@ export function MediaLibrary({ items }: { items: Item[] }) {
                 <Button type="button" variant="outline" size="xs" onClick={() => copyUrl(m.url)}>
                   Copy URL
                 </Button>
+                {m.mime.startsWith("image/") ? (
+                  <Button type="button" variant="outline" size="xs" onClick={() => setEditing(m)}>
+                    <Pencil className="size-3.5" /> Edit
+                  </Button>
+                ) : null}
                 <Button type="button" variant="danger" size="icon" disabled={pending} onClick={() => handleDelete(m.id, m.path)}>
                   <Trash2 className="size-3.5" />
                 </Button>
@@ -241,6 +258,8 @@ export function MediaLibrary({ items }: { items: Item[] }) {
           ))}
         </ul>
       )}
+
+      {editing ? <MediaEditorDialog item={editing} onClose={() => setEditing(null)} /> : null}
     </div>
   );
 }

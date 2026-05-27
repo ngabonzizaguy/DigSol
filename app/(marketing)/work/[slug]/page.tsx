@@ -10,7 +10,7 @@ import { GradientOrb } from "@/components/marketing/gradient-orb";
 import { PageSection } from "@/components/marketing/page-section";
 import { getCaseStudies, getCaseStudy, getService } from "@/lib/content/fetchers";
 import { loadMarketingPageStore, pageCtaContent } from "@/lib/marketing/marketing-page-content";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, ExternalLink, Quote } from "lucide-react";
 
 export async function generateStaticParams() {
   const caseStudies = await getCaseStudies();
@@ -50,7 +50,26 @@ export default async function CaseStudyPage({ params }: { params: Promise<{ slug
               <p className="mt-6 text-[11px] font-semibold uppercase tracking-[0.12em] text-muted">{study.client}</p>
               <h1 className="mt-3 max-w-4xl text-balance font-display text-display-mega text-ink">{study.title}</h1>
               <p className="mt-6 max-w-2xl text-pretty text-[18px] leading-relaxed text-body">{study.summary}</p>
+              {study.show_project_url && study.project_url ? (
+                <a
+                  href={study.project_url}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  className="mt-6 inline-flex items-center gap-2 rounded-full border border-hairline-strong bg-surface-card px-4 py-2 text-[14px] text-ink transition hover:bg-surface-strong"
+                >
+                  Visit the live project
+                  <ExternalLink className="h-3.5 w-3.5" />
+                </a>
+              ) : null}
             </FadeIn>
+            {study.cover_url ? (
+              <FadeIn delay={0.1}>
+                <div className="mt-10 overflow-hidden rounded-2xl border border-hairline bg-surface-card shadow-soft">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={study.cover_url} alt={study.title} className="aspect-[16/9] w-full object-cover" />
+                </div>
+              </FadeIn>
+            ) : null}
           </Container>
         </section>
       </PageSection>
@@ -105,6 +124,72 @@ export default async function CaseStudyPage({ params }: { params: Promise<{ slug
             </div>
           </Container>
         </Section>
+      </PageSection>
+
+      <PageSection pageId="work_detail" sectionId="gallery">
+        {study.media_gallery && study.media_gallery.length > 0 ? (
+          <Section>
+            <Container>
+              <p className="mb-6 text-[11px] font-semibold uppercase tracking-[0.12em] text-muted">Project gallery</p>
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                {study.media_gallery.map((m, i) => {
+                  const isVideo = (m.mime ?? "").startsWith("video/") || /\.(mp4|webm|mov|ogg)$/i.test(m.url);
+                  return (
+                    <FadeIn key={`${m.url}-${i}`} delay={Math.min(i * 0.05, 0.3)}>
+                      <div className="overflow-hidden rounded-2xl border border-hairline bg-surface-card shadow-soft">
+                        {isVideo ? (
+                          <video
+                            src={m.url}
+                            controls
+                            playsInline
+                            preload="metadata"
+                            className="aspect-video w-full bg-canvas-soft object-cover"
+                          />
+                        ) : (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img
+                            src={m.url}
+                            alt={m.alt ?? `${study.title} gallery image ${i + 1}`}
+                            className="aspect-video w-full object-cover"
+                          />
+                        )}
+                        {m.caption ? (
+                          <p className="px-5 py-3 text-[13px] text-muted">{m.caption}</p>
+                        ) : null}
+                      </div>
+                    </FadeIn>
+                  );
+                })}
+              </div>
+            </Container>
+          </Section>
+        ) : null}
+      </PageSection>
+
+      <PageSection pageId="work_detail" sectionId="customer_quote">
+        {study.customer_quote ? (
+          <Section>
+            <Container>
+              <FadeIn>
+                <figure className="mx-auto max-w-3xl rounded-2xl border border-hairline bg-surface-card p-8 shadow-soft lg:p-12">
+                  <Quote className="h-7 w-7 text-muted" aria-hidden />
+                  <blockquote className="mt-4 font-display text-[24px] leading-snug text-ink lg:text-[28px]">
+                    &ldquo;{study.customer_quote}&rdquo;
+                  </blockquote>
+                  {study.customer_name || study.customer_role ? (
+                    <figcaption className="mt-5 text-[13px] text-muted">
+                      {study.customer_name ? (
+                        <span className="font-semibold text-ink">{study.customer_name}</span>
+                      ) : null}
+                      {study.customer_name && study.customer_role ? <span> · </span> : null}
+                      {study.customer_role ? <span>{study.customer_role}</span> : null}
+                    </figcaption>
+                  ) : null}
+                </figure>
+              </FadeIn>
+            </Container>
+          </Section>
+        ) : null}
       </PageSection>
 
       <PageSection pageId="work_detail" sectionId="services_involved">

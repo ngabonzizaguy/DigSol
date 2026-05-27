@@ -6,6 +6,12 @@ import { createClient } from "@/lib/supabase/server";
 import { logActivity } from "@/lib/admin/activity";
 
 const metricSchema = z.object({ label: z.string(), value: z.string() });
+const galleryItemSchema = z.object({
+  url: z.string().url(),
+  mime: z.string().optional(),
+  alt: z.string().optional(),
+  caption: z.string().optional(),
+});
 
 const schema = z.object({
   slug: z.string().min(1),
@@ -24,6 +30,12 @@ const schema = z.object({
   status: z.enum(["draft", "published", "archived"]).default("draft"),
   featured: z.boolean().default(false),
   sort_order: z.number().int().default(0),
+  project_url: z.string().url().nullable().optional(),
+  show_project_url: z.boolean().default(false),
+  customer_quote: z.string().nullable().optional(),
+  customer_name: z.string().nullable().optional(),
+  customer_role: z.string().nullable().optional(),
+  media_gallery: z.array(galleryItemSchema).default([]),
 });
 
 export type CaseStudyFormResult =
@@ -39,6 +51,17 @@ export async function upsertCaseStudy(_prev: CaseStudyFormResult | null, formDat
   const metrics = metricLabels
     .map((label, i) => ({ label: label.trim(), value: (metricValues[i] ?? "").trim() }))
     .filter((m) => m.label && m.value);
+
+  let mediaGallery: { url: string; mime?: string; alt?: string; caption?: string }[] = [];
+  const galleryRaw = formData.get("media_gallery");
+  if (typeof galleryRaw === "string" && galleryRaw.trim()) {
+    try {
+      const parsedGallery = JSON.parse(galleryRaw);
+      if (Array.isArray(parsedGallery)) mediaGallery = parsedGallery;
+    } catch {
+      // Ignore malformed JSON; treat as empty gallery.
+    }
+  }
 
   const raw = {
     slug: (formData.get("slug") as string)?.trim(),
@@ -60,6 +83,13 @@ export async function upsertCaseStudy(_prev: CaseStudyFormResult | null, formDat
     status: formData.get("status"),
     featured: formData.get("featured") === "on" || formData.get("featured") === "true",
     sort_order: Number(formData.get("sort_order") ?? 0),
+    project_url: (formData.get("project_url") as string)?.trim() || null,
+    show_project_url:
+      formData.get("show_project_url") === "on" || formData.get("show_project_url") === "true",
+    customer_quote: (formData.get("customer_quote") as string)?.trim() || null,
+    customer_name: (formData.get("customer_name") as string)?.trim() || null,
+    customer_role: (formData.get("customer_role") as string)?.trim() || null,
+    media_gallery: mediaGallery,
   };
 
   const parsed = schema.safeParse(raw);

@@ -61,3 +61,43 @@ export async function deleteMedia(id: string, path: string) {
   await logActivity({ entity: "media", entity_id: id, action: "delete" });
   revalidatePath("/admin/media");
 }
+
+/**
+ * Replace an existing media row's underlying file with a freshly-uploaded one
+ * (the client uploads to storage first, then calls this to finalize). The
+ * previous storage object is removed so we don't accumulate orphan files.
+ */
+export async function replaceMediaFile(input: {
+  id: string;
+  oldPath: string;
+  newPath: string;
+  mime: string;
+  bytes: number;
+  width?: number | null;
+  height?: number | null;
+}) {
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("media")
+    .update({
+      path: input.newPath,
+      mime: input.mime,
+      bytes: input.bytes,
+      width: input.width ?? null,
+      height: input.height ?? null,
+    })
+    .eq("id", input.id);
+  if (error) throw new Error(error.message);
+
+  if (input.oldPath && input.oldPath !== input.newPath) {
+    await supabase.storage.from("media").remove([input.oldPath]);
+  }
+
+  await logActivity({
+    entity: "media",
+    entity_id: input.id,
+    action: "update",
+    diff: { path: input.newPath, width: input.width, height: input.height },
+  });
+  revalidatePath("/admin/media");
+}

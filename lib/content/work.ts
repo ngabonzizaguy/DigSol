@@ -1,3 +1,10 @@
+export type CaseStudyGalleryItem = {
+  url: string;
+  mime?: string;
+  alt?: string;
+  caption?: string;
+};
+
 export type CaseStudy = {
   slug: string;
   client: string;
@@ -11,6 +18,14 @@ export type CaseStudy = {
   metrics: { label: string; value: string }[];
   services: string[];
   orb: "mint" | "peach" | "lavender" | "sky" | "rose";
+  cover_url?: string | null;
+  featured?: boolean;
+  project_url?: string | null;
+  show_project_url?: boolean;
+  customer_quote?: string | null;
+  customer_name?: string | null;
+  customer_role?: string | null;
+  media_gallery?: CaseStudyGalleryItem[];
 };
 
 export const caseStudies: CaseStudy[] = [

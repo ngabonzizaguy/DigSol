@@ -14,6 +14,30 @@ const hasSupabase = () => Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL && proces
 type Service = (typeof _services)[number];
 type CaseStudy = (typeof _caseStudies)[number];
 
+type SupabaseCaseStudyRow = {
+  slug: string;
+  client: string;
+  title: string;
+  segment: CaseStudy["segment"];
+  industry: string;
+  summary: string;
+  challenge: string;
+  approach: string;
+  outcome: string;
+  metrics: CaseStudy["metrics"];
+  service_slugs?: string[] | null;
+  services?: string[] | null;
+  orb: CaseStudy["orb"];
+  cover_url?: string | null;
+  featured?: boolean | null;
+  project_url?: string | null;
+  show_project_url?: boolean | null;
+  customer_quote?: string | null;
+  customer_name?: string | null;
+  customer_role?: string | null;
+  media_gallery?: CaseStudy["media_gallery"] | null;
+};
+
 function getClient() {
   return createPublicClient();
 }
@@ -27,11 +51,34 @@ function normalizeService(row: Service): Service {
   };
 }
 
-function normalizeCaseStudy(row: CaseStudy): CaseStudy {
+function normalizeCaseStudy(row: CaseStudy | SupabaseCaseStudyRow): CaseStudy {
+  const source = row as SupabaseCaseStudyRow & Partial<CaseStudy>;
+  const services = Array.isArray(source.services)
+    ? source.services
+    : Array.isArray(source.service_slugs)
+      ? source.service_slugs
+      : [];
   return {
-    ...row,
-    services: Array.isArray(row.services) ? row.services : [],
-    metrics: Array.isArray(row.metrics) ? row.metrics : [],
+    slug: source.slug,
+    client: source.client,
+    title: source.title,
+    segment: source.segment,
+    industry: source.industry,
+    summary: source.summary,
+    challenge: source.challenge,
+    approach: source.approach,
+    outcome: source.outcome,
+    metrics: Array.isArray(source.metrics) ? source.metrics : [],
+    services,
+    orb: source.orb,
+    cover_url: source.cover_url ?? source.media_gallery?.[0]?.url ?? null,
+    featured: source.featured ?? false,
+    project_url: source.project_url ?? null,
+    show_project_url: source.show_project_url ?? false,
+    customer_quote: source.customer_quote ?? null,
+    customer_name: source.customer_name ?? null,
+    customer_role: source.customer_role ?? null,
+    media_gallery: Array.isArray(source.media_gallery) ? source.media_gallery : [],
   };
 }
 
